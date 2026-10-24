@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="fr" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Analyseur d'étalonnage</title>
+  <meta name="description" content="Analyse des certificats d'étalonnage : modèles de correction et d'incertitude, calculateur et rapport.">
+  <meta name="referrer" content="no-referrer">
+  <meta name="color-scheme" content="light dark">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230e6e8c'/%3E%3Cpath d='M7 22a9 9 0 0 1 18 0' fill='none' stroke='white' stroke-width='2.4' stroke-linecap='round'/%3E%3Cpath d='M16 22l5-7' stroke='white' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E">
+</head>
+<body>
+  <header class="appbar">
+    <div class="wrap appbar-inner">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 17a8 8 0 0 1 16 0"/><path d="M12 17l4.5-6"/><path d="M12 9v1M7.5 11l.7.7M16.5 11l-.7.7"/></svg>
+        </div>
+        <div class="brand-text">
+          <strong data-i18n="app.title"></strong>
+          <span data-i18n="app.subtitle"></span>
+        </div>
+      </div>
+      <div class="appbar-actions">
+        <button class="icon-btn lang-btn" id="langBtn" type="button"></button>
+        <button class="icon-btn" id="themeBtn" type="button" data-i18n-title="theme"></button>
+      </div>
+    </div>
+    <nav class="wrap tabs" role="tablist">
+      <button class="tab active" role="tab" data-tab="data"><span class="step">1</span><span data-i18n="tab.data"></span></button>
+      <button class="tab" role="tab" data-tab="analysis"><span class="step">2</span><span data-i18n="tab.analysis"></span></button>
+      <button class="tab" role="tab" data-tab="calc"><span class="step">3</span><span data-i18n="tab.calc"></span></button>
+      <button class="tab" role="tab" data-tab="report"><span class="step">4</span><span data-i18n="tab.report"></span></button>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <!-- 1. Données -->
+    <section class="panel active" id="panel-data" role="tabpanel">
+      <div class="page-head">
+        <div>
+          <h1 data-i18n="data.h"></h1>
+          <p data-i18n="data.p"></p>
+        </div>
+        <div class="toolbar">
+          <button class="btn ghost" id="loadSessionBtn" type="button"><span class="ico" data-ico="folder"></span><span data-i18n="btn.loadSession"></span></button>
+          <button class="btn ghost" id="saveSessionBtn" type="button"><span class="ico" data-ico="save"></span><span data-i18n="btn.saveSession"></span></button>
+        </div>
+      </div>
+
+      <div class="layout-data">
+        <div class="card dropzone" id="pointsCard">
+          <div class="card-head">
+            <div>
+              <h2><span class="ico" data-ico="table"></span><span data-i18n="points.title"></span></h2>
+              <p class="card-sub" data-i18n="points.sub"></p>
+            </div>
+            <div class="toolbar">
+              <button class="btn" id="exampleBtn" type="button"><span class="ico" data-ico="spark"></span><span data-i18n="btn.example"></span></button>
+              <button class="btn" id="importBtn" type="button"><span class="ico" data-ico="upload"></span><span data-i18n="btn.importFile"></span></button>
+              <button class="btn ghost danger" id="clearBtn" type="button"><span class="ico" data-ico="trash"></span><span class="lbl-opt" data-i18n="btn.clear"></span></button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="table-wrap">
+              <table class="pts">
+                <thead><tr>
+                  <th>#</th>
+                  <th><span data-i18n="col.indication"></span> <span class="unit-i"></span></th>
+                  <th><span data-i18n="col.correction"></span> <span class="unit-c"></span></th>
+                  <th><span data-i18n="col.uncertainty"></span> <span class="unit-u"></span></th>
+                  <th></th>
+                </tr></thead>
+                <tbody id="pointsBody"></tbody>
+              </table>
+            </div>
+            <div class="table-foot">
+              <button class="btn" id="addRowBtn" type="button"><span class="ico" data-ico="plus"></span><span data-i18n="btn.addRow"></span></button>
+              <p class="help"><span class="ico" data-ico="info"></span><span data-i18n="points.hint"></span></p>
+            </div>
+            <div class="alerts" id="dataAlerts"></div>
+          </div>
+        </div>
+
+        <div class="stack">
+          <div class="card">
+            <div class="card-head"><h2><span class="ico" data-ico="doc"></span><span data-i18n="meta.title"></span></h2></div>
+            <div class="card-body fields two">
+              <label class="field full"><span data-i18n="f.instrument"></span><input id="m-instrument" data-i18n-ph="ph.instrument" autocomplete="off"></label>
+              <label class="field"><span data-i18n="f.certificate"></span><input id="m-certificate" data-i18n-ph="ph.optional" autocomplete="off"></label>
+              <label class="field"><span data-i18n="f.date"></span><input id="m-date" type="date"></label>
+              <label class="field full"><span data-i18n="f.lab"></span><input id="m-lab" data-i18n-ph="ph.optional" autocomplete="off"></label>
+              <label class="field"><span data-i18n="f.unitI"></span><input id="m-unitI" placeholder="°C, bar, g…" autocomplete="off"></label>
+              <label class="field"><span data-i18n="f.unitC"></span><input id="m-unitC" placeholder="°C, bar, g…" autocomplete="off"></label>
+              <label class="field"><span data-i18n="f.unitU"></span><input id="m-unitU" placeholder="°C, bar, g…" autocomplete="off"></label>
+              <label class="field"><span data-i18n="f.nature"></span>
+                <select id="m-nature">
+                  <option value="" data-i18n="nature.unknown"></option>
+                  <option value="U" data-i18n="nature.expanded"></option>
+                  <option value="u" data-i18n="nature.standard"></option>
+                </select>
+              </label>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><h2><span class="ico" data-ico="sliders"></span><span data-i18n="crit.title"></span></h2></div>
+            <div class="card-body fields">
+              <div class="seg" role="radiogroup">
+                <button type="button" data-mode="fraction" class="on" data-i18n="mode.fraction"></button>
+                <button type="button" data-mode="absolute" data-i18n="mode.absolute"></button>
+              </div>
+              <div class="fields two" id="fractionFields">
+                <label class="field"><span data-i18n="f.alphaC"></span><input id="s-alphaC" type="number" min="0" step="any" value="0.25"></label>
+                <label class="field"><span data-i18n="f.alphaU"></span><input id="s-alphaU" type="number" min="0" step="any" value="0.25"></label>
+              </div>
+              <div class="fields two" id="absoluteFields" hidden>
+                <label class="field"><span data-i18n="f.limitC"></span><input id="s-limitC" type="number" min="0" step="any" value="0"></label>
+                <label class="field"><span data-i18n="f.limitU"></span><input id="s-limitU" type="number" min="0" step="any" value="0"></label>
+              </div>
+              <p class="help" id="critHelp"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-bar">
+        <div class="summary" id="dataSummary"></div>
+        <button class="btn primary lg" id="analyzeBtn" type="button"><span class="ico" data-ico="play"></span><span data-i18n="btn.analyze"></span></button>
+      </div>
+    </section>
+
+    <!-- 2. Analyse -->
+    <section class="panel" id="panel-analysis" role="tabpanel">
+      <div class="page-head">
+        <div><h1 data-i18n="an.h"></h1><p data-i18n="an.p"></p></div>
+      </div>
+      <div id="analysisEmpty" class="card empty"></div>
+      <div id="analysisContent" hidden>
+        <div class="verdict" id="verdict"></div>
+        <div class="kpis" id="kpis"></div>
+        <div class="alerts" id="analysisAlerts" style="margin:-4px 0 18px"></div>
+        <div class="grid-2">
+          <div class="card model-card">
+            <div class="card-head"><h2><span class="ico" data-ico="chart"></span><span data-i18n="model.correction"></span></h2><span id="decC"></span></div>
+            <div class="card-body">
+              <div class="eq-box" id="eqC"></div>
+              <div class="legend"><span><i class="dot"></i><span data-i18n="chart.measured"></span></span><span><i class="fit"></i><span data-i18n="chart.fit"></span></span></div>
+              <div class="chart" id="chartC"></div>
+              <dl class="stats" id="statsC"></dl>
+              <p class="sub-title" data-i18n="chart.residuals"></p>
+              <div class="legend"><span><i class="bar"></i><span data-i18n="chart.residual"></span></span><span><i class="thr"></i><span data-i18n="chart.threshold"></span></span></div>
+              <div class="chart" id="resC"></div>
+              <p class="note" id="noteC"></p>
+            </div>
+          </div>
+          <div class="card model-card">
+            <div class="card-head"><h2><span class="ico" data-ico="chart"></span><span data-i18n="model.uncertainty"></span></h2><span id="decU"></span></div>
+            <div class="card-body">
+              <div class="eq-box" id="eqU"></div>
+              <div class="legend"><span><i class="dot"></i><span data-i18n="chart.measured"></span></span><span><i class="fit"></i><span data-i18n="chart.fit"></span></span><span><i class="maj"></i><span data-i18n="chart.majorant"></span></span></div>
+              <div class="chart" id="chartU"></div>
+              <dl class="stats" id="statsU"></dl>
+              <p class="sub-title" data-i18n="chart.residuals"></p>
+              <div class="legend"><span><i class="bar"></i><span data-i18n="chart.residual"></span></span><span><i class="thr"></i><span data-i18n="chart.threshold"></span></span></div>
+              <div class="chart" id="resU"></div>
+              <p class="note" id="noteU"></p>
+            </div>
+          </div>
+        </div>
+        <p class="note"><span class="ico" data-ico="info"></span><span data-i18n="an.disclaimer"></span></p>
+      </div>
+    </section>
+
+    <!-- 3. Calculateur -->
+    <section class="panel" id="panel-calc" role="tabpanel">
+      <div class="page-head">
+        <div><h1 data-i18n="calc.h"></h1><p data-i18n="calc.p"></p></div>
+      </div>
+      <div id="calcEmpty" class="card empty"></div>
+      <div id="calcContent" hidden>
+        <div class="layout-calc">
+          <div class="card">
+            <div class="card-head"><h2><span class="ico" data-ico="calc"></span><span data-i18n="calc.form"></span></h2></div>
+            <div class="card-body fields">
+              <label class="field"><span data-i18n="f.inputI"></span>
+                <input id="c-input" type="number" step="any">
+                <span class="range-hint"><span id="c-lo"></span><span id="c-hi"></span></span>
+              </label>
+              <label class="field"><span data-i18n="f.methodC"></span>
+                <select id="c-methodC"><option value="regression" data-i18n="method.regression"></option><option value="interpolation" data-i18n="method.interpolation"></option></select>
+              </label>
+              <label class="field"><span data-i18n="f.methodU"></span>
+                <select id="c-methodU"><option value="majorant" data-i18n="method.majorant"></option><option value="fitted" data-i18n="method.fitted"></option></select>
+              </label>
+              <label class="check"><input type="checkbox" id="c-confirm"><span data-i18n="calc.confirm"></span></label>
+              <button class="btn primary lg" id="calcBtn" type="button"><span class="ico" data-ico="calc"></span><span data-i18n="btn.calculate"></span></button>
+              <div class="alerts" id="calcAlerts" style="margin:0"></div>
+            </div>
+          </div>
+          <div class="stack">
+            <div class="card">
+              <div class="card-head"><h2><span class="ico" data-ico="target"></span><span data-i18n="calc.result"></span></h2></div>
+              <div class="card-body" id="calcResult"></div>
+            </div>
+            <div class="card">
+              <div class="card-head">
+                <h2><span class="ico" data-ico="list"></span><span data-i18n="calc.history"></span></h2>
+                <button class="btn ghost" id="clearHistoryBtn" type="button"><span class="ico" data-ico="trash"></span><span data-i18n="btn.clear"></span></button>
+              </div>
+              <div class="card-body"><div class="table-wrap"><table class="history" id="historyTable"></table></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Rapport -->
+    <section class="panel" id="panel-report" role="tabpanel">
+      <div class="page-head">
+        <div><h1 data-i18n="rep.h"></h1><p data-i18n="rep.p"></p></div>
+        <div class="toolbar no-print" id="reportActions">
+          <button class="btn" id="csvBtn" type="button"><span class="ico" data-ico="download"></span><span data-i18n="btn.exportCsv"></span></button>
+          <button class="btn primary" id="printBtn" type="button"><span class="ico" data-ico="printer"></span><span data-i18n="btn.print"></span></button>
+        </div>
+      </div>
+      <div id="reportEmpty" class="card empty"></div>
+      <article class="paper" id="paper" hidden></article>
+    </section>
+  </main>
+
+  <footer class="site"><span class="ico" data-ico="lock"></span><span data-i18n="footer"></span></footer>
+  <div id="toasts" aria-live="polite"></div>
+  <dialog id="pdfDialog" class="dlg"><div id="pdfBody"></div></dialog>
+  <input type="file" id="csvFile" accept=".csv,.txt,.pdf,text/csv,application/pdf" hidden>
+  <input type="file" id="sessionFile" accept=".json,application/json" hidden>
+  <script src="core.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

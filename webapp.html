@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>محلل بيانات المعايرة</title>
+  <style>
+    :root{font-family:"Segoe UI",Tahoma,Arial,sans-serif;color:#172b4d;background:#f3f6fb;font-synthesis:none}
+    *{box-sizing:border-box}
+    body{margin:0}
+    header{background:linear-gradient(120deg,#143b67,#216b84);color:white;padding:26px max(20px,calc((100% - 1180px)/2))}
+    header h1{margin:0 0 8px;font-size:26px}
+    header p{margin:0;color:#d9e9f3}
+    main{max-width:1180px;margin:22px auto;padding:0 18px 40px}
+    .notice{padding:12px 16px;background:#e8f4f8;border-right:4px solid #2986a0;border-radius:8px;margin-bottom:16px;color:#244e61}
+    .card{background:white;border:1px solid #e1e8f0;border-radius:12px;padding:18px;margin:14px 0;box-shadow:0 3px 12px #1834560a}
+    .card h2{font-size:18px;margin:0 0 14px}
+    .toolbar,.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    button,.file-button{border:0;border-radius:8px;padding:10px 15px;font:inherit;font-weight:600;cursor:pointer;background:#eaf0f7;color:#203c5c}
+    button.primary{background:#176b83;color:white}
+    button:hover,.file-button:hover{filter:brightness(.96)}
+    button:disabled{opacity:.45;cursor:not-allowed}
+    input,select{font:inherit;color:#172b4d;border:1px solid #cbd6e2;border-radius:7px;padding:8px;background:white;max-width:100%}
+    input[type=number]{width:100%}
+    input[type=checkbox]{width:18px;height:18px;vertical-align:middle}
+    .metadata{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:12px}
+    label.field{display:grid;gap:5px;font-size:13px;color:#435a73}
+    .table-wrap{overflow:auto;margin:12px 0}
+    table{border-collapse:collapse;width:100%;min-width:520px}
+    th,td{border-bottom:1px solid #e5ebf1;padding:8px;text-align:right}
+    th{background:#f4f7fa;font-weight:650}
+    td input{min-width:110px}
+    .settings{display:flex;align-items:end;gap:14px;flex-wrap:wrap}
+    .settings .field{min-width:150px}
+    .muted{color:#667a90;font-size:13px}
+    .status{padding:12px 14px;border-radius:8px;margin-top:12px;white-space:pre-line}
+    .status.ok{background:#e8f6ee;color:#17613b}
+    .status.warn{background:#fff4dc;color:#704e08}
+    .status.error{background:#fdecec;color:#842727}
+    .results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    .metric{background:#f5f8fb;border-radius:9px;padding:13px}
+    .metric strong{display:block;color:#176b83;font-size:18px;margin-top:5px;direction:ltr;text-align:right}
+    .charts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    .chart{width:100%;height:270px;border:1px solid #e7edf3;border-radius:8px}
+    .calc-grid{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:12px;align-items:end}
+    .result-box{background:#edf7fa;border:1px solid #cce5ec;border-radius:10px;padding:16px;margin-top:14px;line-height:1.9}
+    .result-box strong{color:#125f77}
+    .hidden{display:none}
+    #file{display:none}
+    footer{color:#6e7c8b;font-size:12px;text-align:center;padding:14px}
+    @media(max-width:760px){.metadata,.calc-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.charts{grid-template-columns:1fr}.results{grid-template-columns:1fr}}
+    @media(max-width:460px){.metadata,.calc-grid{grid-template-columns:1fr}header h1{font-size:22px}}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>محلل بيانات المعايرة</h1>
+    <p>أدخل نقاط الشهادة، راجع النماذج، واحسب النتيجة ضمن مجال المعايرة.</p>
+  </header>
+  <main>
+    <div class="notice">هذه نسخة ويب محلية أولية من المحلل. الحسابات أداة مساعدة، ولا تُعدّ وحدها اعتمادًا أو قرارًا مترولوجيًا رسميًا.</div>
+
+    <section class="card">
+      <h2>بيانات الجهاز والشهادة</h2>
+      <div class="metadata">
+        <label class="field">الجهاز<input id="instrument" placeholder="مثال: ميزان رقمي"></label>
+        <label class="field">رقم الشهادة<input id="certificate" placeholder="اختياري"></label>
+        <label class="field">وحدة الإشارة<input id="unitI" placeholder="مثال: °C"></label>
+        <label class="field">وحدة التصحيح<input id="unitC" placeholder="يجب أن تطابق وحدة الإشارة للحساب"></label>
+        <label class="field">وحدة عدم اليقين<input id="unitU" placeholder="اختياري"></label>
+        <label class="field">طبيعة عدم اليقين
+          <select id="nature"><option value="">غير محددة</option><option>عدم يقين موسع U</option><option>عدم يقين معياري u</option></select>
+        </label>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>نقاط المعايرة</h2>
+      <div class="toolbar">
+        <button class="primary" id="example">تحميل المثال</button>
+        <button id="addRow">إضافة نقطة</button>
+        <button id="removeRow">حذف آخر نقطة</button>
+        <label class="file-button" for="file">استيراد CSV</label>
+        <input id="file" type="file" accept=".csv,text/csv">
+        <span class="muted">الأعمدة: Indication;Correction;Incertitude — يمكن استخدام فاصلة عشرية.</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>الإشارة (Indication)</th><th>التصحيح (Correction)</th><th>عدم اليقين (Incertitude)</th></tr></thead>
+          <tbody id="points"></tbody>
+        </table>
+      </div>
+      <div class="settings">
+        <label class="field">طريقة العتبة
+          <select id="thresholdMode"><option value="fraction">نسبة من متوسط عدم اليقين</option><option value="absolute">عتبة مطلقة</option></select>
+        </label>
+        <label class="field fraction-setting">نسبة عتبة التصحيح<input id="alphaC" type="number" min="0" step="any" value="0.25"></label>
+        <label class="field fraction-setting">نسبة عتبة عدم اليقين<input id="alphaU" type="number" min="0" step="any" value="0.25"></label>
+        <label class="field absolute-setting hidden">عتبة التصحيح<input id="limitC" type="number" min="0" step="any" value="0"></label>
+        <label class="field absolute-setting hidden">عتبة عدم اليقين<input id="limitU" type="number" min="0" step="any" value="0"></label>
+        <button id="analyze" class="primary">تحليل البيانات</button>
+      </div>
+      <div id="analysisStatus" class="status hidden" role="status"></div>
+    </section>
+
+    <section id="analysis" class="card hidden">
+      <h2>نتائج التحليل</h2>
+      <div id="metrics" class="results"></div>
+      <div class="charts">
+        <div><h3>نموذج التصحيح</h3><canvas id="chartC" class="chart"></canvas></div>
+        <div><h3>نموذج عدم اليقين</h3><canvas id="chartU" class="chart"></canvas></div>
+      </div>
+      <p class="muted">R² مؤشر وصفي فقط. العتبات إعدادات أولية ولا تمثل قاعدة معيارية عامة.</p>
+    </section>
+
+    <section id="calculator" class="card hidden">
+      <h2>حساب نتيجة عند إشارة محددة</h2>
+      <p class="muted">الحساب متاح داخل مجال نقاط المعايرة فقط. أكد مراجعتك للنموذج قبل الحساب.</p>
+      <div class="calc-grid">
+        <label class="field">الإشارة المراد حسابها<input id="inputI" type="number" step="any"></label>
+        <label class="field">طريقة حساب التصحيح<select id="methodC"><option value="regression">الانحدار الخطي</option><option value="interpolation">الاستيفاء بين النقاط</option></select></label>
+        <label class="field">طريقة عدم اليقين<select id="methodU"><option value="majorant">الخط المحافظ (Majorante)</option><option value="fitted">الخط الملائم</option></select></label>
+        <button class="primary" id="calculate">احسب النتيجة</button>
+      </div>
+      <p><label><input id="confirm" type="checkbox"> أؤكد أنني راجعت النموذج وطريقة الحساب.</label></p>
+      <div id="calcStatus" class="status hidden" role="status"></div>
+      <div id="calcResult" class="result-box hidden"></div>
+    </section>
+    <footer>تُجرى جميع العمليات داخل المتصفح؛ لا تُرسل البيانات إلى خادم.</footer>
+  </main>
+  <script>
+  (() => {
+    const $ = id => document.getElementById(id);
+    const tbody = $("points");
+    let current = null;
+    const fmt = value => Number.isFinite(value) ? new Intl.NumberFormat("ar", {maximumSignificantDigits: 7}).format(value) : "غير معرّف";
+    function row(values = ["", "", ""]) {
+      const tr = document.createElement("tr");
+      values.forEach(value => {
+        const td = document.createElement("td");
+        const input = document.createElement("input");
+        input.type = "text"; input.inputMode = "decimal"; input.value = value;
+        input.setAttribute("aria-label", "قيمة نقطة المعايرة");
+        td.append(input); tr.append(td);
+      });
+      tbody.append(tr);
+    }
+    function setRows(data) { tbody.replaceChildren(); data.forEach(row); }
+    function invalidateAnalysis() {
+      current = null;
+      $("analysis").classList.add("hidden");
+      $("calculator").classList.add("hidden");
+      $("calcResult").classList.add("hidden");
+      $("confirm").checked = false;
+    }
+    function message(id, text, kind) {
+      const el = $(id); el.textContent = text; el.className = `status ${kind}`;
+    }
+    function number(value) {
+      const normalized = String(value).trim().replace(/[\u00a0\u202f ]/g, "").replace(/[−–]/g, "-");
+      const parsed = normalized.includes(",") && !normalized.includes(".") ? normalized.replace(",", ".") : normalized;
+      return parsed === "" ? NaN : Number(parsed);
+    }
+    function readPoints() {
+      return [...tbody.rows].map((tr, i) => {
+        const values = [...tr.querySelectorAll("input")].map(input => number(input.value));
+        if (values.some(v => !Number.isFinite(v))) throw new Error(`تأكد من إدخال أرقام صحيحة في جميع خانات النقطة ${i + 1}.`);
+        if (values[2] < 0) throw new Error(`عدم اليقين لا يمكن أن يكون سالبًا (النقطة ${i + 1}).`);
+        return {x: values[0], c: values[1], u: values[2]};
+      });
+    }
+    function fit(points, key) {
+      const n = points.length, mx = points.reduce((s, p) => s + p.x, 0) / n;
+      const my = points.reduce((s, p) => s + p[key], 0) / n;
+      const sxx = points.reduce((s, p) => s + (p.x - mx) ** 2, 0);
+      if (!Number.isFinite(sxx) || sxx <= Number.EPSILON * Math.max(1, ...points.map(p => Math.abs(p.x))) ** 2 * n)
+        throw new Error("مجال الإشارة ثابت أو ضيق جدًا لإجراء الانحدار.");
+      const a = points.reduce((s, p) => s + (p.x - mx) * (p[key] - my), 0) / sxx, b = my - a * mx;
+      const residuals = points.map(p => p[key] - (a * p.x + b));
+      const sse = residuals.reduce((s, r) => s + r * r, 0);
+      const sst = points.reduce((s, p) => s + (p[key] - my) ** 2, 0);
+      const tol = 1e-10 * Math.max(1, points.reduce((s, p) => s + p[key] ** 2, 0));
+      return {a, b, residuals, maxResidual: Math.max(...residuals.map(Math.abs)),
+        r2: sst <= tol ? NaN : 1 - sse / sst, constant: sst <= tol};
+    }
+    function analyze() {
+      $("calcResult").classList.add("hidden"); $("calcStatus").classList.add("hidden");
+      try {
+        let points = readPoints();
+        if (points.length < 3) throw new Error("يلزم إدخال ثلاث نقاط معايرة على الأقل.");
+        const xs = points.map(p => p.x);
+        if (new Set(xs).size !== xs.length) throw new Error("توجد إشارتان متطابقتان؛ يجب أن تكون كل الإشارات فريدة.");
+        if (xs.some((x, i) => i && x < xs[i - 1])) {
+          points = points.slice().sort((a, b) => a.x - b.x);
+          setRows(points.map(p => [p.x, p.c, p.u]));
+        }
+        const c = fit(points, "c"), u = fit(points, "u");
+        const meanU = points.reduce((sum, p) => sum + p.u, 0) / points.length;
+        const fraction = $("thresholdMode").value === "fraction";
+        const sc = fraction ? number($("alphaC").value) * meanU : number($("limitC").value);
+        const su = fraction ? number($("alphaU").value) * meanU : number($("limitU").value);
+        if (![sc, su].every(v => Number.isFinite(v) && v >= 0)) throw new Error("العتبات والنسب يجب أن تكون أرقامًا غير سالبة.");
+        const majorant = {...u, b: u.b + u.maxResidual};
+        const lo = points[0].x, hi = points[points.length - 1].x;
+        const tolerance = 1e-10 * Math.max(1, ...points.map(p => Math.abs(p.u)));
+        const majorantUsable = [lo, hi].every(x => majorant.a * x + majorant.b >= -tolerance);
+        current = {points, c, u, majorant, lo, hi, majorantUsable,
+          sc, su, nature: $("nature").value, unitI: $("unitI").value.trim(), unitC: $("unitC").value.trim()};
+        const decision = (model, limit) => model.maxResidual <= limit + 1e-10 * Math.max(1, limit, model.maxResidual) ? "مقبول حسب عتبة البواقي" : "غير مقبول حسب عتبة البواقي";
+        const statusText = [
+          `التصحيح: ${decision(c, sc)} (العتبة ${fmt(sc)}؛ أكبر باقي ${fmt(c.maxResidual)}).`,
+          `عدم اليقين: ${decision(u, su)} (العتبة ${fmt(su)}؛ أكبر باقي ${fmt(u.maxResidual)}).`,
+          `مجال المعايرة: ${fmt(lo)} إلى ${fmt(hi)}.`,
+          ...(xs.some((x, i) => i && x < xs[i - 1]) ? ["تم ترتيب النقاط مع صفوفها حسب الإشارة."] : []),
+          ...(!majorantUsable ? ["تحذير: الخط المحافظ يعطي قيمًا سالبة ضمن المجال ولا يمكن استخدامه."] : [])
+        ].join("\n");
+        message("analysisStatus", statusText, majorantUsable ? "ok" : "warn");
+        $("analysis").classList.remove("hidden"); $("calculator").classList.remove("hidden");
+        $("metrics").innerHTML = [
+          ["التصحيح: المعادلة", `C = ${fmt(c.a)} × I + ${fmt(c.b)}`],
+          ["التصحيح: R² / أكبر باقي", `${fmt(c.r2)} / ${fmt(c.maxResidual)}`],
+          ["عدم اليقين: المعادلة", `U = ${fmt(u.a)} × I + ${fmt(u.b)}`],
+          ["الخط المحافظ لعدم اليقين", `U = ${fmt(majorant.a)} × I + ${fmt(majorant.b)}`]
+        ].map(([label, value]) => `<div class="metric">${label}<strong>${value}</strong></div>`).join("");
+        $("inputI").min = lo; $("inputI").max = hi; $("inputI").value = (lo + hi) / 2;
+        $("confirm").checked = false;
+        drawChart($("chartC"), points, c, "c", null);
+        drawChart($("chartU"), points, u, "u", majorant);
+        $("analysis").scrollIntoView({behavior:"smooth", block:"start"});
+      } catch (error) {
+        current = null; $("analysis").classList.add("hidden"); $("calculator").classList.add("hidden");
+        message("analysisStatus", error.message, "error");
+      }
+    }
+    function drawChart(canvas, points, model, key, extra) {
+      const rect = canvas.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+      canvas.width = Math.max(1, rect.width * dpr); canvas.height = Math.max(1, rect.height * dpr);
+      const ctx = canvas.getContext("2d"); ctx.scale(dpr, dpr);
+      const w = rect.width, h = rect.height, pad = {l:48, r:16, t:18, b:38};
+      const series = [points.map(p => p[key]), points.map(p => model.a*p.x+model.b)];
+      if (extra) series.push(points.map(p => extra.a*p.x+extra.b));
+      let ymin = Math.min(...series.flat()), ymax = Math.max(...series.flat());
+      if (ymin === ymax) {ymin -= 1; ymax += 1;}
+      const xmin=points[0].x, xmax=points.at(-1).x, xspan=xmax-xmin || 1, yspan=ymax-ymin || 1;
+      const px=x=>pad.l+(x-xmin)/xspan*(w-pad.l-pad.r), py=y=>h-pad.b-(y-ymin)/yspan*(h-pad.t-pad.b);
+      ctx.font="12px Segoe UI,Arial"; ctx.strokeStyle="#e7edf3"; ctx.fillStyle="#667a90"; ctx.lineWidth=1;
+      for(let i=0;i<5;i++){const y=pad.t+i*(h-pad.t-pad.b)/4;ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(w-pad.r,y);ctx.stroke();ctx.fillText(fmt(ymax-i*yspan/4),3,y+4);}
+      const line=(a,b,color,dash=[])=>{ctx.beginPath();ctx.setLineDash(dash);ctx.strokeStyle=color;ctx.lineWidth=2;ctx.moveTo(px(xmin),py(a*xmin+b));ctx.lineTo(px(xmax),py(a*xmax+b));ctx.stroke();ctx.setLineDash([]);};
+      line(model.a,model.b,"#147a9a");
+      if(extra) line(extra.a,extra.b,"#df8d28",[6,4]);
+      ctx.fillStyle="#263d59";points.forEach(p=>{ctx.beginPath();ctx.arc(px(p.x),py(p[key]),4,0,Math.PI*2);ctx.fill();});
+      ctx.fillStyle="#52677e";ctx.fillText(fmt(xmin),pad.l,h-10);ctx.fillText(fmt(xmax),w-pad.r-34,h-10);
+      ctx.fillStyle="#147a9a";ctx.fillText("القياس: ●  الانحدار: ━",w/2-55,15);
+      if(extra){ctx.fillStyle="#b96b10";ctx.fillText("المحافظ: - -",w/2-35,32);}
+    }
+    function calculate() {
+      $("calcResult").classList.add("hidden");
+      try {
+        if (!current) throw new Error("أجرِ التحليل أولًا.");
+        if (!$("confirm").checked) throw new Error("يرجى تأكيد مراجعة النموذج قبل الحساب.");
+        if (!current.nature) throw new Error("حدد طبيعة عدم اليقين من بيانات الشهادة قبل عرض نتيجة كاملة.");
+        if (current.unitI && current.unitC && current.unitI !== current.unitC)
+          throw new Error("وحدتا الإشارة والتصحيح مختلفتان؛ لا يمكن حساب الإشارة + التصحيح دون تحويل موثق.");
+        const x = number($("inputI").value);
+        if (!Number.isFinite(x)) throw new Error("أدخل إشارة رقمية صحيحة.");
+        if (x < current.lo || x > current.hi) throw new Error("الإشارة خارج مجال المعايرة؛ لا يتم الاستقراء خارج المجال.");
+        const correction = $("methodC").value === "regression"
+          ? current.c.a*x+current.c.b
+          : interpolate(x, current.points, "c");
+        const uncertaintyModel = $("methodU").value === "majorant" ? current.majorant : current.u;
+        if ($("methodU").value === "majorant" && !current.majorantUsable)
+          throw new Error("الخط المحافظ لعدم اليقين سلبي ضمن المجال؛ اختر الخط الملائم أو راجع البيانات.");
+        const uncertainty = uncertaintyModel.a*x+uncertaintyModel.b;
+        const endpointValues=[current.lo,current.hi].map(v=>uncertaintyModel.a*v+uncertaintyModel.b);
+        if (uncertainty < 0 || endpointValues.some(v=>v<0)) throw new Error("نموذج عدم اليقين يعطي قيمة سالبة.");
+        const corrected = x+correction, unit=current.unitI || current.unitC;
+        const result = $("calcResult");
+        result.innerHTML = `<strong>نتيجة الحساب</strong><br>الإشارة: <bdi>${fmt(x)} ${escapeHtml(unit)}</bdi><br>التصحيح: <bdi>${fmt(correction)} ${escapeHtml(current.unitC || unit)}</bdi><br>القيمة المصححة (I + C): <bdi><strong>${fmt(corrected)} ${escapeHtml(unit)}</strong></bdi><br>عدم اليقين (${escapeHtml(current.nature)}): <bdi>${fmt(uncertainty)} ${escapeHtml($("unitU").value.trim())}</bdi><br><span class="muted">الحساب ضمن مجال المعايرة؛ التفسير المترولوجي النهائي يحتاج إلى مراجعة المختص.</span>`;
+        result.classList.remove("hidden"); $("calcStatus").classList.add("hidden");
+      } catch(error) { message("calcStatus",error.message,"error"); }
+    }
+    function interpolate(x, points, key) {
+      for (let i=1;i<points.length;i++) if (x<=points[i].x) {
+        const left=points[i-1],right=points[i];
+        return left[key]+(x-left.x)*(right[key]-left[key])/(right.x-left.x);
+      }
+      return points.at(-1)[key];
+    }
+    function escapeHtml(text) { return String(text).replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch])); }
+    $("example").addEventListener("click",()=>{
+      setRows([[0,"0,1","0,2"],[10,"0,2","0,22"],[20,"0,3","0,24"],[30,"0,4","0,26"]]);
+      $("nature").value="عدم يقين موسع U"; $("unitI").value=""; $("unitC").value=""; $("unitU").value="";
+      $("analysisStatus").classList.add("hidden"); $("analysis").classList.add("hidden"); $("calculator").classList.add("hidden");
+    });
+    $("addRow").addEventListener("click",()=>row());
+    $("removeRow").addEventListener("click",()=>{if(tbody.rows.length)tbody.deleteRow(-1);});
+    $("thresholdMode").addEventListener("change",()=>{
+      const fraction=$("thresholdMode").value==="fraction";
+      document.querySelectorAll(".fraction-setting").forEach(el=>el.classList.toggle("hidden",!fraction));
+      document.querySelectorAll(".absolute-setting").forEach(el=>el.classList.toggle("hidden",fraction));
+    });
+    $("analyze").addEventListener("click",analyze);
+    $("calculate").addEventListener("click",calculate);
+    tbody.addEventListener("input",invalidateAnalysis);
+    ["instrument","certificate","unitI","unitC","unitU","nature","thresholdMode","alphaC","alphaU","limitC","limitU"]
+      .forEach(id=>$(id).addEventListener("input",invalidateAnalysis));
+    $("addRow").addEventListener("click",invalidateAnalysis);
+    $("removeRow").addEventListener("click",invalidateAnalysis);
+    $("file").addEventListener("change",event=>{
+      const file=event.target.files[0];if(!file)return;
+      const reader=new FileReader();
+      reader.onload=()=>{
+        try{
+          const lines=String(reader.result).replace(/^\uFEFF/,"").split(/\r?\n/).filter(line=>line.trim());
+          if(lines.length<2)throw new Error("ملف CSV فارغ أو لا يحتوي على نقاط.");
+          const delimiter=lines[0].includes(";")?";":",";
+          const parse=line=>line.split(delimiter).map(value=>value.trim().replace(/^"(.*)"$/,"$1"));
+          const header=parse(lines[0]).map(value=>value.toLowerCase());
+          if (!["indication","correction","incertitude"].every(name=>header.includes(name)))
+            throw new Error("يجب أن يحتوي السطر الأول على عناوين الأعمدة Indication وCorrection وIncertitude.");
+          const data=lines.slice(1);
+          const points=data.map((line,i)=>{
+            const cols=parse(line);
+            if(cols.length<3)throw new Error(`عدد الأعمدة غير صحيح في سطر CSV ${i+2}.`);
+            return cols.slice(0,3);
+          });
+          setRows(points);invalidateAnalysis();$("analysisStatus").classList.add("hidden");
+        }catch(error){message("analysisStatus",error.message,"error");}
+        event.target.value="";
+      };
+      reader.onerror=()=>message("analysisStatus","تعذر قراءة ملف CSV.","error");
+      reader.readAsText(file);
+    });
+    window.addEventListener("resize",()=>{if(current){drawChart($("chartC"),current.points,current.c,"c",null);drawChart($("chartU"),current.points,current.u,"u",current.majorant);}});
+    setRows([["","",""],["","",""],["","",""]]);
+  })();
+  </script>
+</body>
+</html>

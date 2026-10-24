@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tests du moteur</title>
+  <style>
+    body { font: 14px/1.5 system-ui, sans-serif; margin: 24px; background: #f6f8fa; color: #0f172a; }
+    h1 { font-size: 18px; } .ok { color: #15803d; } .ko { color: #b91c1c; font-weight: 700; }
+    li { font-family: ui-monospace, Consolas, monospace; font-size: 13px; }
+    #summary { font-size: 16px; font-weight: 700; padding: 10px 14px; border-radius: 8px; background: #fff; border: 1px solid #e2e8f0; }
+  </style>
+</head>
+<body>
+  <h1>Tests du moteur web (références : tests/TestRegression.m)</h1>
+  <div id="summary">…</div>
+  <ul id="out"></ul>
+  <script src="core.js"></script>
+  <script>
+  (() => {
+    const K = window.EtalonnageCore, out = document.getElementById('out');
+    let pass = 0, fail = 0;
+    const log = (ok, name, detail = '') => {
+      ok ? pass++ : fail++;
+      const li = document.createElement('li'); li.className = ok ? 'ok' : 'ko';
+      li.textContent = `${ok ? 'PASS' : 'FAIL'}  ${name}${detail ? ' — ' + detail : ''}`; out.append(li);
+    };
+    const near = (name, got, exp, tol = 1e-12) => {
+      const ok = Array.isArray(exp) ? exp.every((e, i) => Math.abs(got[i] - e) <= tol) : Math.abs(got - exp) <= tol;
+      log(ok, name, ok ? '' : `obtenu ${JSON.stringify(got)}, attendu ${JSON.stringify(exp)}`);
+    };
+    const throwsCode = (name, fn, code) => {
+      try { fn(); log(false, name, 'aucune erreur'); } catch (e) { log(e.code === code, name, e.code === code ? '' : `code ${e.code}`); }
+    };
+    const pts = (x, c, u) => x.map((v, i) => ({ x: v, c: c[i], u: u[i] }));
+    const meta = { nature: 'U', unitI: 'u', unitC: 'u' };
+
+    // casAExact
+    {
+      const x = [0, 10, 20, 30], C = [.1, .2, .3, .4], U = [.2, .22, .24, .26];
+      const c = K.ajusterDroite(x, C), u = K.ajusterDroite(x, U);
+      near('A: a correction', c.a, .01); near('A: b correction', c.b, .1);
+      near('A: résidus nuls', c.residu, [0, 0, 0, 0]); near('A: R² = 1', c.R2, 1);
+      near('A: a incertitude', u.a, .002); near('A: b incertitude', u.b, .2);
+      const v = K.valider(x.map((xi, i) => [String(xi), String(C[i]), String(U[i])]), { mode: 'fraction', alphaC: '0.25', alphaU: '0.25' });
+      near('A: seuil 25 % moyenne U', v.sC, .0575);
+      const A = K.analyser(v.pts, v.sC, v.sU);
+      log(x.every((xi, i) => A.maj.a * xi + A.maj.b >= U[i] - 1e-12), 'A: majorante >= U aux points');
+      const r = K.calculer(A, meta, 15, 'regression', 'majorant', true);
+      near('A: correction en 15', r.C, .25); near('A: valeur corrigée', r.corrected, 15.25); near('A: incertitude majorante', r.U, .23);
+      throwsCode('A: 31 hors étendue', () => K.calculer(A, meta, 31, 'regression', 'majorant', true), 'outOfRange');
+      throwsCode('A: modèles non confirmés', () => K.calculer(A, meta, 15, 'regression', 'majorant', false), 'confirm');
+      throwsCode('A: nature inconnue bloque', () => K.calculer(A, { ...meta, nature: '' }, 15, 'regression', 'majorant', true), 'nature');
+      throwsCode('A: unités incompatibles bloquent', () => K.calculer(A, { ...meta, unitC: 'mV' }, 15, 'regression', 'majorant', true), 'unitsCalc');
+      throwsCode('A: unité correction absente bloque', () => K.calculer(A, { ...meta, unitC: '' }, 15, 'regression', 'majorant', true), 'unitsCalc');
+      near('A: bornes incluses (0)', K.calculer(A, meta, 0, 'regression', 'fitted', true).U, .2);
+      near('A: bornes incluses (30)', K.calculer(A, meta, 30, 'interpolation', 'fitted', true).C, .4);
+    }
+    // casBReference
+    {
+      const x = [0, 20, 50, 80, 100], C = [.4, .1, .8, .3, .2], U = [.8, .3, .5, .7, .2];
+      const c = K.ajusterDroite(x, C), u = K.ajusterDroite(x, U);
+      near('B: a', c.a, -.0005882352941176471); near('B: b', c.b, .3894117647058824);
+      near('B: résidu max', c.residuMax, .44); near('B: R²', c.R2, .008058017727639);
+      near('B: s_res', c.sRes, .3107233811734211);
+      near('B: b majorante', u.b + u.residuMax, .911764705882353);
+      // Contrôle indépendant par équations normales (formule non centrée).
+      const n = x.length, Sx = x.reduce((s, v) => s + v, 0), Sy = C.reduce((s, v) => s + v, 0);
+      const Sxy = x.reduce((s, v, i) => s + v * C[i], 0), Sxx = x.reduce((s, v) => s + v * v, 0);
+      const a2 = (n * Sxy - Sx * Sy) / (n * Sxx - Sx * Sx);
+      near('B: pente = équations normales', c.a, a2, 1e-12); near('B: ordonnée = équations normales', c.b, (Sy - a2 * Sx) / n, 1e-12);
+      const A = K.analyser(pts(x, C, U), .25 * .5, .25 * .5);
+      log(A.decC.ok === false, 'B: correction non représentative (0,44 > 0,125)');
+      log(A.decC.r2 === 'r2.low', 'B: remarque R² faible (informative)');
+    }
+    // casConstant
+    {
+      const m = K.ajusterDroite([0, 10, 20], [.2, .2, .2]);
+      near('Constant: a = 0', m.a, 0); log(Number.isNaN(m.R2), 'Constant: R² indéfini'); near('Constant: s_res = 0', m.sRes, 0);
+      log(K.evaluerCritere(m, 0).ok === true, 'Constant: non rejeté à cause du R² indéfini');
+      log(K.evaluerCritere(m, 0).r2 === 'r2.undef', 'Constant: remarque « données constantes »');
+    }
+    // validationEtSeuils
+    {
+      const s = { mode: 'fraction', alphaC: '0.25', alphaU: '0.25' };
+      log(K.valider([['0', '.1', '.2'], ['10', '.2', '.3']], s).errors[0]?.code === 'minPoints', 'Validation: 2 points refusés');
+      log(K.valider([['10', '.1', '.2'], ['10', '.2', '.3'], ['10', '.3', '.4']], s).errors.some(e => e.code === 'dup'), 'Validation: doublons refusés');
+      log(K.valider([['0', '.1', '.2'], ['10', '.2', '-.1'], ['20', '.3', '.4']], s).errors.some(e => e.code === 'negU'), 'Validation: U négative refusée');
+      log(K.valider([['0', '.1', '.2'], ['10', 'abc', '.3'], ['20', '.3', '.4']], s).errors.some(e => e.code === 'nan'), 'Validation: texte refusé (pas de zéro silencieux)');
+      log(K.valider([['0', '.1', '.2'], ['10', '', '.3'], ['20', '.3', '.4']], s).errors.some(e => e.code === 'nan'), 'Validation: cellule vide refusée');
+      log(K.valider([['0', '.1', '.2'], ['10', '.2', '.3'], ['20', '.3', '.4']], { ...s, alphaC: '-1' }).errors.some(e => e.code === 'threshold'), 'Validation: fraction négative refusée');
+      log(K.valider([['0', '.1', '.2'], ['10', '.2', '.3'], ['20', '.3', '.4']], { mode: 'absolute', limitC: '0.1', limitU: 'x' }).errors.some(e => e.code === 'threshold'), 'Validation: seuil absolu invalide refusé');
+      const v = K.valider([['20', '.3', '.4'], ['0', '.1', '0'], ['10', '.2', '.3']], s);
+      log(v.needsSort && !v.errors.length, 'Validation: tri proposé, pas imposé');
+      log(v.warnings.includes('warn.zeroU') && v.warnings.includes('warn.three'), 'Validation: avertissements U = 0 et 3 points');
+      throwsCode('Analyse: refuse des points non triés', () => K.analyser(v.pts, v.sC, v.sU), 'notSorted');
+    }
+    // Normalisation
+    {
+      near('Parse: virgule décimale', K.parseNum('0,25'), .25);
+      near('Parse: moins Unicode', K.parseNum('−0,5'), -.5);
+      near('Parse: ± incertitude', K.parseNum('± 0,27', true), .27);
+      log(Number.isNaN(K.parseNum('± 0,27')), 'Parse: ± refusé hors incertitude');
+      log(Number.isNaN(K.parseNum('1.234,5')), 'Parse: format ambigu refusé');
+      log(Number.isNaN(K.parseNum('12 °C')), 'Parse: suffixe d’unité refusé');
+      near('Parse: espace insécable', K.parseNum('1 000,5'), 1000.5);
+    }
+    // interpolationAuxPoints
+    {
+      const p = pts([0, 10, 20], [1, 3, 2], [0, 0, 0]);
+      near('Interpolation: retrouve C au point', K.interpolation(10, p), 3);
+      near('Interpolation: entre points', K.interpolation(15, p), 2.5);
+      throwsCode('Interpolation: hors étendue', () => K.interpolation(21, p), 'outOfRange');
+    }
+    // Incertitude ajustée négative dans l'étendue
+    {
+      const A = K.analyser(pts([0, 10, 20], [0, 0, 0], [0, 0, 1]), 1, 1);
+      near('U ajustée: a', A.u.a, .05); near('U ajustée: b', A.u.b, -1 / 6);
+      throwsCode('U ajustée négative à une borne : calcul bloqué', () => K.calculer(A, meta, 15, 'regression', 'fitted', true), 'negModel');
+      log(A.maj.usable, 'Majorante utilisable (>= U >= 0 aux bornes)');
+    }
+    // Lignes de certificat (convention Correction = −Erreur)
+    {
+      const r1 = K.ligneCertificat([-0.08, 0, 0.08], .27);
+      log(r1.ok && r1.ref === -0.08 && r1.eq === 0 && r1.err === 0.08, 'Certificat: réf | équip | erreur');
+      const r2 = K.ligneCertificat([24.9, 25.02, -0.12], .42);
+      log(r2.ok && r2.ref === 25.02 && r2.eq === 24.9, 'Certificat: équip | réf | erreur');
+      log(!K.ligneCertificat([-0.08, 0.08, 0], .27).ok, 'Certificat: colonnes mélangées signalées');
+      log(!K.ligneCertificat([10, 10.5, 0.9], .3).ok, 'Certificat: erreur imprimée incohérente signalée');
+      log(!K.ligneCertificat([11.76, 1.84], 1.7).ok, 'Certificat: erreur absente signalée (jamais acceptée en silence)');
+    }
+
+    document.getElementById('summary').textContent = `${pass} réussis, ${fail} échoués`;
+    document.getElementById('summary').className = fail ? 'ko' : 'ok';
+    window.__resultats = { pass, fail };
+  })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+# Données de clients : ne jamais publier de certificats ni de jeux réels
+*.pdf
+*.PDF
+examples/CTEM*.csv
+__cert_test.pdf
+
+# Sessions et sorties générées
+*.mat
+*.xlsx
+*.png
+build/
+
+# MATLAB
+*.asv
+*.autosave
+slprj/
+
+# Système / outils
+.vercel/
+.DS_Store
+Thumbs.db
+desktop.ini
