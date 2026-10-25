@@ -16,6 +16,7 @@
   <div id="summary">…</div>
   <ul id="out"></ul>
   <script src="core.js"></script>
+  <script src="xlsx.js"></script>
   <script>
   (() => {
     const K = window.EtalonnageCore, out = document.getElementById('out');
@@ -46,15 +47,15 @@
       near('A: seuil 25 % moyenne U', v.sC, .0575);
       const A = K.analyser(v.pts, v.sC, v.sU);
       log(x.every((xi, i) => A.maj.a * xi + A.maj.b >= U[i] - 1e-12), 'A: majorante >= U aux points');
-      const r = K.calculer(A, meta, 15, 'regression', 'majorant', true);
+      const r = K.calculer(A, meta, 15, 'regression', true);
       near('A: correction en 15', r.C, .25); near('A: valeur corrigée', r.corrected, 15.25); near('A: incertitude majorante', r.U, .23);
-      throwsCode('A: 31 hors étendue', () => K.calculer(A, meta, 31, 'regression', 'majorant', true), 'outOfRange');
-      throwsCode('A: modèles non confirmés', () => K.calculer(A, meta, 15, 'regression', 'majorant', false), 'confirm');
-      throwsCode('A: nature inconnue bloque', () => K.calculer(A, { ...meta, nature: '' }, 15, 'regression', 'majorant', true), 'nature');
-      throwsCode('A: unités incompatibles bloquent', () => K.calculer(A, { ...meta, unitC: 'mV' }, 15, 'regression', 'majorant', true), 'unitsCalc');
-      throwsCode('A: unité correction absente bloque', () => K.calculer(A, { ...meta, unitC: '' }, 15, 'regression', 'majorant', true), 'unitsCalc');
-      near('A: bornes incluses (0)', K.calculer(A, meta, 0, 'regression', 'fitted', true).U, .2);
-      near('A: bornes incluses (30)', K.calculer(A, meta, 30, 'interpolation', 'fitted', true).C, .4);
+      throwsCode('A: 31 hors étendue', () => K.calculer(A, meta, 31, 'regression', true), 'outOfRange');
+      throwsCode('A: modèles non confirmés', () => K.calculer(A, meta, 15, 'regression', false), 'confirm');
+      throwsCode('A: nature inconnue bloque', () => K.calculer(A, { ...meta, nature: '' }, 15, 'regression', true), 'nature');
+      throwsCode('A: unités incompatibles bloquent', () => K.calculer(A, { ...meta, unitC: 'mV' }, 15, 'regression', true), 'unitsCalc');
+      throwsCode('A: unité correction absente bloque', () => K.calculer(A, { ...meta, unitC: '' }, 15, 'regression', true), 'unitsCalc');
+      near('A: bornes incluses (0)', K.calculer(A, meta, 0, 'regression', true).uFit, .2);
+      near('A: bornes incluses (30)', K.calculer(A, meta, 30, 'interpolation', true).C, .4);
     }
     // casBReference
     {
@@ -83,7 +84,11 @@
     // validationEtSeuils
     {
       const s = { mode: 'fraction', alphaC: '0.25', alphaU: '0.25' };
-      log(K.valider([['0', '.1', '.2'], ['10', '.2', '.3']], s).errors[0]?.code === 'minPoints', 'Validation: 2 points refusés');
+      log(K.valider([['0', '.1', '.2']], s).errors[0]?.code === 'minPoints', 'Validation: 1 point refusé (n < 2)');
+      const v2 = K.valider([['0', '.1', '.2'], ['10', '.2', '.3']], s);
+      log(!v2.errors.length && v2.warnings.includes('warn.two'), 'Validation: 2 points acceptés avec avertissement');
+      const A2 = K.analyser(v2.pts, v2.sC, v2.sU);
+      log(A2.c.residuMax < 1e-12 && Number.isNaN(A2.c.sRes), 'n = 2 : droite exacte, résidu nul, s_res non défini');
       log(K.valider([['10', '.1', '.2'], ['10', '.2', '.3'], ['10', '.3', '.4']], s).errors.some(e => e.code === 'dup'), 'Validation: doublons refusés');
       log(K.valider([['0', '.1', '.2'], ['10', '.2', '-.1'], ['20', '.3', '.4']], s).errors.some(e => e.code === 'negU'), 'Validation: U négative refusée');
       log(K.valider([['0', '.1', '.2'], ['10', 'abc', '.3'], ['20', '.3', '.4']], s).errors.some(e => e.code === 'nan'), 'Validation: texte refusé (pas de zéro silencieux)');
@@ -116,8 +121,75 @@
     {
       const A = K.analyser(pts([0, 10, 20], [0, 0, 0], [0, 0, 1]), 1, 1);
       near('U ajustée: a', A.u.a, .05); near('U ajustée: b', A.u.b, -1 / 6);
-      throwsCode('U ajustée négative à une borne : calcul bloqué', () => K.calculer(A, meta, 15, 'regression', 'fitted', true), 'negModel');
+      const r = K.calculer(A, meta, 15, 'regression', true);
+      log(r.uFitOk === false, 'U modélisée négative à une borne : signalée non exploitable (jamais remplacée par 0)');
+      log(r.uPrudent >= 0, 'U prudente (recommandée) reste exploitable');
       log(A.maj.usable, 'Majorante utilisable (>= U >= 0 aux bornes)');
+    }
+    // Cas de test du cahier des charges CalibFit (tolérance 1e-6)
+    {
+      const rows = [[0, '0,10', '0,05'], [20, '0,00', '0,06'], [40, '-0,10', '0,08'], [60, '-0,10', '0,08'], [80, '-0,20', '0,09'], [100, '-0,30', '0,10']]
+        .map(r => r.map(String));
+      const v = K.valider(rows, { mode: 'fraction', alphaC: '0.25', alphaU: '0.25' });
+      const A = K.analyser(v.pts, v.sC, v.sU);
+      const t6 = 1e-6;
+      near('Cahier: a_C', A.c.a, -0.00371429, t6); near('Cahier: b_C', A.c.b, 0.0857143, t6);
+      near('Cahier: résidu max C', A.c.residuMax, 0.0371429, t6);
+      near('Cahier: a_U', A.u.a, 0.000485714, t6); near('Cahier: b_U', A.u.b, 0.0523810, t6);
+      near('Cahier: résidu max U', A.u.residuMax, 0.00819048, t6);
+      const m = { nature: 'U', unitI: '°C', unitC: '°C', unitU: '°C' };
+      const r = K.calculer(A, m, 50, 'regression', true);
+      near('Cahier: C(50)', r.C, -0.1, t6); near('Cahier: valeur corrigée', r.corrected, 49.9, t6);
+      near('Cahier: U(50)', r.uFit, 0.0766667, t6); near('Cahier: U prudente(50)', r.uPrudent, 0.0848571, t6);
+      throwsCode('Cahier: I = 120 bloqué', () => K.calculer(A, m, 120, 'regression', true), 'outOfRange');
+      throwsCode('Cahier: I = −5 bloqué', () => K.calculer(A, m, -5, 'regression', true), 'outOfRange');
+      log(K.alerteLinearite(A, m) === false, 'Cahier: résidu max C (0,037) < plus petite U (0,05) : pas d’alerte de linéarité');
+      log(K.alerteLinearite(A, { ...m, unitU: 'K' }) === false, 'Linéarité : unités différentes, pas de comparaison');
+      const B = K.analyser([{ x: 0, c: 0, u: .01 }, { x: 10, c: .5, u: .01 }, { x: 20, c: 0, u: .01 }], 1, 1);
+      log(K.alerteLinearite(B, m) === true, 'Linéarité : résidu max > plus petite U → alerte');
+    }
+    // Classeur Excel : vraies formules + valeurs en cache identiques au moteur
+    {
+      const rows = [[0, '0,10', '0,05'], [20, '0,00', '0,06'], [40, '-0,10', '0,08'], [60, '-0,10', '0,08'], [80, '-0,20', '0,09'], [100, '-0,30', '0,10']]
+        .map(r => r.map(String));
+      const v = K.valider(rows, { mode: 'fraction', alphaC: '0.25', alphaU: '0.25' });
+      const A = K.analyser(v.pts, v.sC, v.sU);
+      const X = window.EtalonnageXlsx;
+      const meta = { certificate: 'CE 01/26', instrument: 'Thermomètre', date: '2026-07-15', unitI: '°C', unitC: '°C', unitU: '°C', k: '2', nature: 'U' };
+      const files = X.unzipStored(X.build(A, meta, { kVerified: true }));
+      const s1 = files['xl/worksheets/sheet1.xml'], s2 = files['xl/worksheets/sheet2.xml'];
+      const cached = (xml, ref) => +new RegExp(`<c r="${ref}"[^>]*><f>[^<]*</f><v>([^<]*)</v>`).exec(xml)?.[1];
+      log(Object.keys(files).length === 15 && !!files['xl/charts/chart1.xml'] && !!files['xl/charts/chart2.xml'], 'Excel: 2 feuilles, 2 graphiques');
+      log(/<sheet name="Interpolation"/.test(files['xl/workbook.xml']) && /<sheet name="Modélisation"/.test(files['xl/workbook.xml']), 'Excel: feuilles « Interpolation » et « Modélisation »');
+      log(s1.includes('<f>SLOPE(C11:C16,B11:B16)</f>') && s1.includes('<f>INTERCEPT(C11:C16,B11:B16)</f>') && s1.includes('<f>RSQ(C11:C16,B11:B16)</f>')
+        && s1.includes('<f>COUNT(B11:B16)</f>') && s1.includes('<f>MAX(F11:F16)</f>'), 'Excel: formules SLOPE, INTERCEPT, RSQ, COUNT, MAX présentes');
+      log(s1.includes('<f>$J$11*B11+$J$12</f>') && s1.includes('<f>C11-D11</f>') && s1.includes('<f>ABS(E11)</f>'), 'Excel: ajustée, résidu et |résidu| en formules');
+      log(s2.includes('<f>D11+$J$15</f>'), 'Excel: U prudente = ajustée + résidu max (formule)');
+      near('Excel: a_C en cache = moteur', cached(s1, 'J11'), A.c.a, 1e-15); near('Excel: b_C en cache', cached(s1, 'J12'), A.c.b, 1e-15);
+      near('Excel: résidu max C en cache', cached(s1, 'J15'), 0.0371429, 1e-6);
+      near('Excel: a_U en cache', cached(s2, 'J11'), 0.000485714, 1e-6); near('Excel: résidu max U en cache', cached(s2, 'J15'), 0.00819048, 1e-6);
+      log(/<c:trendlineType val="linear"\/><c:dispRSqr val="1"\/><c:dispEq val="1"\/>/.test(files['xl/charts/chart1.xml']), 'Excel: courbe de tendance linéaire avec équation et R²');
+      log(files['xl/charts/chart2.xml'].includes("'Modélisation'!$B$11:$B$16"), 'Excel: graphique lié aux cellules');
+      log(/orientation="landscape"/.test(s1) && /state="frozen"/.test(s1), 'Excel: paysage et volets figés');
+      log(X.fileName(meta) === 'certificat_CE-01-26_Thermometre_2026-07-15.xlsx', 'Excel: nom de fichier certificat_<n°>_<série>_<date>');
+      log(X.crc32(new TextEncoder().encode('123456789')) === 0xcbf43926, 'ZIP: CRC-32 de référence');
+    }
+    // Incertitude relative (% de la lecture) : U_abs = U% × |I| / 100
+    {
+      const v = K.valider([['10', '0', '1'], ['-20', '0', '1'], ['50', '0', '2']], { mode: 'fraction', alphaC: '0.25', alphaU: '0.25', uncType: 'relative' });
+      near('Relative: U_abs', v.pts.map(p => p.u), [0.1, 0.2, 1]);
+      near('Relative: valeur d’origine conservée', v.pts.map(p => p.uRaw), [1, 1, 2]);
+    }
+    // Arrondi d'affichage de l'incertitude : 2 chiffres significatifs, vers le haut
+    {
+      const a = u => K.arrondirIncertitude(u);
+      log(a(0.0766667).value === 0.077 && a(0.0766667).decimals === 3, 'Arrondi: 0,0766667 → 0,077 (3 décimales)');
+      log(a(0.0848571).value === 0.085, 'Arrondi: 0,0848571 → 0,085');
+      log(a(0.08).value === 0.08, 'Arrondi: 0,08 reste 0,08 (pas de faux arrondi flottant)');
+      log(a(0.121).value === 0.13, 'Arrondi: 0,121 → 0,13 (vers le haut)');
+      log(a(2.41).value === 2.5 && a(2.41).decimals === 1, 'Arrondi: 2,41 → 2,5');
+      log(a(37).value === 37 && a(37).decimals === 0, 'Arrondi: 37 → 37');
+      log(a(123).value === 130 && a(123).decimals === 0, 'Arrondi: 123 → 130');
     }
     // Lignes de certificat (convention Correction = −Erreur)
     {

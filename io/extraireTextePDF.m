@@ -153,6 +153,8 @@ end
                 if v<-1000 && ~isempty(strtrim(seg))
                     emettre(seg,debut); seg=''; avance=avance-v/1000; debut=avance;
                 else
+                    % Décalage de la taille d'une espace (> 0,25 em) : séparation des mots conservée.
+                    if v<-250 && ~isempty(seg), seg=[seg ' ']; end %#ok<AGROW>
                     avance=avance-v/1000; if isempty(seg), debut=avance; end
                 end
             elseif iscell(v)

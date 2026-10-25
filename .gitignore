@@ -20,3 +20,6 @@ slprj/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Icônes de l'application mobile (générées par Flutter) : à versionner
+!mobile/**/*.png

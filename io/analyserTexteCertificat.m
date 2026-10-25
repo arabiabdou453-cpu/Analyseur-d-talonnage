@@ -88,7 +88,8 @@ function meta = lireMetadonnees(lignes)
 meta=struct('instrument','','identifiant','','certificat','','dateEtalonnage','', ...
     'natureIncertitude','','conditions','');
 texte=strjoin(lignes',newline);
-meta.certificat=valeur(texte,['Certificat\s*n.{0,2}\s*:?\s*([A-Z0-9][\w/\-.]*)']);
+% « n », puis au plus 2 symboles (º, °, .) : jamais un chiffre du numéro lui-même.
+meta.certificat=valeur(texte,'Certificat\s*n[^A-Za-z0-9\s]{0,2}\s*:?\s*([A-Z0-9][\w/\-.]*)');
 instrument=valeur(texte,'Instrument\s+[ée]talonn[ée]\s*:?\s*([^\n]+)');
 details=strjoin(nonVides({valeur(texte,'Constructeur\s*:?\s*([^\n]+)'),valeur(texte,'\nType\s*:?\s*([^\n]+)')}),' ');
 meta.instrument=strjoin(nonVides({instrument,details}),' — ');

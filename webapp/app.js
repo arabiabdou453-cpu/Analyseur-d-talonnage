@@ -42,7 +42,7 @@
       'verdict.mixed': 'نموذج واحد فقط مقبول حسب معيار البواقي',
       'verdict.sub': 'حُلّلت {n} نقاط في المجال {lo} → {hi}. هذا الفحص لا يشكّل وحده مصادقة مترولوجية كاملة.',
       'kpi.points': 'عدد النقاط', 'kpi.range': 'مجال المعايرة', 'kpi.thrC': 'عتبة التصحيح', 'kpi.thrU': 'عتبة عدم اليقين',
-      'model.correction': 'نموذج التصحيح', 'model.uncertainty': 'نموذج عدم اليقين', 'model.majorant': 'الخط المحافظ',
+      'model.correction': 'الاستيفاء (التصحيح)', 'model.uncertainty': 'النمذجة (عدم اليقين)', 'model.majorant': 'U الحذرة (الخط المحافظ)',
       'st.r2': 'R²', 'st.maxRes': 'أكبر باقٍ', 'st.sres': 's_res', 'st.thr': 'العتبة',
       'dec.ok': 'مقبول', 'dec.ko': 'غير ممثِّل',
       'r2.low': 'R² منخفض: ملاحظة إعلامية فقط، دون قاعدة رفض عامة.', 'r2.undef': 'R² غير معرّف: القيم ثابتة.',
@@ -58,7 +58,7 @@
       'calc.confirm': 'أؤكد أنني راجعت النموذجين وطريقة الحساب.',
       'calc.result': 'النتيجة', 'calc.corrected': 'القيمة المصححة (I + C)', 'calc.correction': 'التصحيح',
       'calc.indication': 'الإشارة', 'calc.uncertainty': 'عدم اليقين', 'calc.method': 'الطريقة',
-      'calc.empty': 'أدخل إشارة واضغط «احسب النتيجة».',
+      'calc.empty': 'أدخل إشارة: تظهر النتيجة فورًا.',
       'calc.note': 'حساب داخل المجال؛ التفسير المترولوجي يحتاج إلى تأكيد.',
       'calc.history': 'سجل الحسابات', 'calc.historyEmpty': 'لا توجد حسابات بعد.',
       'calc.empty.h': 'الحاسبة غير متاحة', 'calc.empty.p': 'يجب إجراء التحليل أولًا لتفعيل الحاسبة.',
@@ -71,7 +71,7 @@
       'rep.foot': 'أداة مساعدة: هذا التقرير لا يُعدّ وحده اعتمادًا أو قرارًا مترولوجيًا رسميًا. يجب أن يراجعه مختص.',
       'footer': 'تُجرى جميع العمليات داخل المتصفح؛ لا تُرسل أي بيانات إلى خادم.',
       'none': '—',
-      'err.minPoints': 'يلزم إدخال ثلاث نقاط معايرة على الأقل.',
+      'err.minPoints': 'يلزم إدخال نقطتي معايرة على الأقل.',
       'err.nan': 'النقطة {row}، عمود {col}: قيمة غير رقمية أو فارغة.',
       'err.negU': 'النقطة {row}: عدم اليقين لا يمكن أن يكون سالبًا.',
       'err.dup': 'إشارتان متطابقتان في النقطتين {a} و{b}.',
@@ -115,7 +115,21 @@
       'confirm.sort': 'الإشارات غير مرتبة تصاعديًا. ترتيب النقاط (مع إبقاء كل صف كاملًا) ثم التحليل؟',
       'err.notSortedUser': 'لم يتم التحليل: النقاط غير مرتبة. رتّبها أو وافق على الترتيب.',
       'err.notSorted': 'النقاط غير مرتبة حسب الإشارة.', 'err.method': 'طريقة حساب غير معروفة.',
-      'err.fitInput': 'يلزم ثلاث نقاط حقيقية ومنتهية على الأقل.',
+      'err.fitInput': 'يلزم نقطتان حقيقيتان ومنتهيتان على الأقل.',
+      'f.k': 'معامل التوسيع k', 'k.verify': 'للتحقق', 'f.uncType': 'نوع عدم اليقين',
+      'unc.absolute': 'مطلق', 'unc.relative': 'نسبي (% من القراءة)', 'f.validUntil': 'تاريخ انتهاء الصلاحية (اختياري)',
+      'warn.two': 'نقطتان فقط: الخط مضبوط تمامًا والباقي معدوم — النموذج غير ممثِّل.',
+      'warn.linearity': 'تنبيه الخطية: أكبر باقٍ للتصحيح يتجاوز أصغر عدم يقين في الشهادة؛ النموذج الخطي لم يعد مهملًا أمام عدم يقين المعايرة.',
+      'warn.relative': 'عدم اليقين نسبي: حُوّل إلى قيمة مطلقة U = U% × |I| / 100 قبل الانحدار (القيم الأصلية محفوظة).',
+      'warn.kDefault': 'k = 2 قيمة افتراضية غير مأخوذة من الشهادة: تحقّق منها.',
+      'calc.heroNote': 'القيمة المصححة ± U الحذرة (k = {k}) · القيمة المصححة = الإشارة + التصحيح',
+      'calc.uFit': 'U المنمذجة', 'calc.uFitNeg': 'غير قابلة للاستعمال (سالبة)', 'calc.uPrudent': 'U الحذرة',
+      'calc.recommended': 'موصى بها', 'calc.expired': 'انتهت صلاحية الشهادة ({d}): النتيجة للعلم فقط.',
+      'calc.validRange': 'المجال الصالح', 'calc.resMaxC': 'أكبر باقٍ للاستيفاء', 'calc.exact': 'قيم غير مقرّبة',
+      'btn.copy': 'نسخ النتيجة', 'toast.copied': 'تم نسخ النتيجة', 'err.copy': 'تعذّر النسخ',
+      'calc.formulas': 'الصيغ المستعملة',
+      'calc.formulasNote': 'انحدار خطي بالمربعات الصغرى غير مرجّح. U مقرّبة إلى رقمين معنويين نحو الأعلى، والتصحيح بنفس عدد الأرقام العشرية.',
+      'btn.addHistory': 'إضافة إلى السجل', 'btn.excel': 'تصدير Excel', 'toast.excel': 'تم تصدير ملف Excel',
     },
     fr: {
       'app.title': 'Analyseur d’étalonnage',
@@ -151,7 +165,7 @@
       'verdict.mixed': 'Un seul modèle est acceptable selon le critère sur les résidus',
       'verdict.sub': '{n} points analysés sur l’étendue {lo} → {hi}. Ce contrôle ne constitue pas à lui seul une validation métrologique complète.',
       'kpi.points': 'Points', 'kpi.range': 'Étendue', 'kpi.thrC': 'Seuil correction', 'kpi.thrU': 'Seuil incertitude',
-      'model.correction': 'Modèle de correction', 'model.uncertainty': 'Modèle d’incertitude', 'model.majorant': 'Droite majorante',
+      'model.correction': 'Interpolation (correction)', 'model.uncertainty': 'Modélisation (incertitude)', 'model.majorant': 'U prudente (majorante)',
       'st.r2': 'R²', 'st.maxRes': 'Résidu max', 'st.sres': 's_res', 'st.thr': 'Seuil',
       'dec.ok': 'Acceptable', 'dec.ko': 'Non représentatif',
       'r2.low': 'R² faible : remarque informative, sans règle universelle de rejet.', 'r2.undef': 'R² non défini : données constantes.',
@@ -167,7 +181,7 @@
       'calc.confirm': 'Je confirme avoir vérifié les modèles et la méthode de calcul.',
       'calc.result': 'Résultat', 'calc.corrected': 'Valeur corrigée (I + C)', 'calc.correction': 'Correction',
       'calc.indication': 'Indication', 'calc.uncertainty': 'Incertitude', 'calc.method': 'Méthode',
-      'calc.empty': 'Saisissez une indication puis cliquez sur « Calculer ».',
+      'calc.empty': 'Saisissez une indication : le résultat s’affiche instantanément.',
       'calc.note': 'Calcul dans l’étendue ; interprétation métrologique à confirmer.',
       'calc.history': 'Historique', 'calc.historyEmpty': 'Aucun calcul pour l’instant.',
       'calc.empty.h': 'Calculateur indisponible', 'calc.empty.p': 'Lancez d’abord l’analyse pour activer le calculateur.',
@@ -180,7 +194,7 @@
       'rep.foot': 'Outil d’aide : ce rapport ne constitue pas à lui seul une validation ou une décision métrologique officielle. Il doit être revu par un spécialiste.',
       'footer': 'Tous les calculs sont effectués dans le navigateur ; aucune donnée n’est envoyée à un serveur.',
       'none': '—',
-      'err.minPoints': 'Au moins trois points sont requis.',
+      'err.minPoints': 'Au moins deux points sont requis.',
       'err.nan': 'Point {row}, colonne {col} : valeur vide ou non numérique.',
       'err.negU': 'Point {row} : incertitude négative interdite.',
       'err.dup': 'Deux indications identiques aux points {a} et {b}.',
@@ -224,7 +238,21 @@
       'confirm.sort': 'Les indications ne sont pas croissantes. Trier les points (lignes entières conservées) puis analyser ?',
       'err.notSortedUser': 'Analyse non lancée : points non triés. Triez-les ou acceptez le tri.',
       'err.notSorted': 'Points non triés selon l’indication.', 'err.method': 'Méthode de calcul non reconnue.',
-      'err.fitInput': 'Il faut au moins trois paires réelles et finies.',
+      'err.fitInput': 'Il faut au moins deux paires réelles et finies.',
+      'f.k': 'Facteur d’élargissement k', 'k.verify': 'à vérifier', 'f.uncType': 'Type d’incertitude',
+      'unc.absolute': 'Absolue', 'unc.relative': 'Relative (% de la lecture)', 'f.validUntil': 'Date de validité (facultative)',
+      'warn.two': 'Deux points seulement : droite exacte, résidu nul — modèle non représentatif.',
+      'warn.linearity': 'Alerte de linéarité : le résidu max de la correction dépasse la plus petite incertitude du certificat ; le modèle linéaire n’est plus négligeable devant l’incertitude d’étalonnage.',
+      'warn.relative': 'Incertitude relative : convertie en absolue U = U% × |I| / 100 avant régression (valeurs d’origine conservées).',
+      'warn.kDefault': 'k = 2 est une valeur par défaut, non lue sur le certificat : à vérifier.',
+      'calc.heroNote': 'Valeur corrigée ± U prudente (k = {k}) · valeur corrigée = indication + correction',
+      'calc.uFit': 'U modélisée', 'calc.uFitNeg': 'Non exploitable (négative)', 'calc.uPrudent': 'U prudente',
+      'calc.recommended': 'recommandée', 'calc.expired': 'Certificat expiré ({d}) : résultat à titre indicatif uniquement.',
+      'calc.validRange': 'Étendue valide', 'calc.resMaxC': 'Résidu max interpolation', 'calc.exact': 'Valeurs non arrondies',
+      'btn.copy': 'Copier le résultat', 'toast.copied': 'Résultat copié', 'err.copy': 'Copie impossible',
+      'calc.formulas': 'Formules utilisées',
+      'calc.formulasNote': 'Régression linéaire par moindres carrés ordinaires, non pondérée. U arrondie à 2 chiffres significatifs vers le haut ; correction affichée avec le même nombre de décimales.',
+      'btn.addHistory': 'Ajouter à l’historique', 'btn.excel': 'Exporter Excel', 'toast.excel': 'Fichier Excel exporté',
     },
   };
 
@@ -259,7 +287,7 @@
 
   /* ---------- State ---------- */
   const $ = id => document.getElementById(id);
-  const META_FIELDS = ['instrument', 'certificate', 'date', 'lab', 'unitI', 'unitC', 'unitU', 'nature'];
+  const META_FIELDS = ['instrument', 'certificate', 'date', 'lab', 'unitI', 'unitC', 'unitU', 'nature', 'k', 'uncType', 'validUntil'];
   const state = {
     lang: 'fr',
     theme: null,
@@ -371,8 +399,10 @@
       mode: state.mode,
       alphaC: $('s-alphaC').value, alphaU: $('s-alphaU').value,
       limitC: $('s-limitC').value, limitU: $('s-limitU').value,
+      uncType: $('m-uncType').value === 'relative' ? 'relative' : 'absolute',
     };
   }
+  function updateKPill() { $('kVerifyPill').hidden = !!state.kVerified; }
   function setMode(mode) {
     state.mode = mode;
     document.querySelectorAll('.seg button').forEach(b => {
@@ -419,21 +449,25 @@
     if (v.needsSort) {
       if (!confirm(t('confirm.sort'))) return { errors: [t('err.notSortedUser')], warnings: [] };
       pts = pts.slice().sort((a, b) => a.x - b.x);
-      setRows(pts.map(p => [rawStr(p.x), rawStr(p.c), rawStr(p.u)]));
+      // Valeur d'origine (uRaw) : en mode relatif, p.u est la valeur convertie en absolu.
+      setRows(pts.map(p => [rawStr(p.x), rawStr(p.c), rawStr(p.uRaw ?? p.u)]));
       warnings.push('warn.sorted');
     }
     let A;
     try { A = Core.analyser(pts, v.sC, v.sU); }
     catch (err) { return { errors: [err.code ? coreMessage(err.code, err.params) : err.message], warnings }; }
     if (!A.maj.usable) warnings.push('warn.majorant');
+    if (Core.alerteLinearite(A, meta)) warnings.push('warn.linearity');
+    if (meta.uncType === 'relative') warnings.push('warn.relative');
+    if (!state.kVerified) warnings.push('warn.kDefault');
     return { errors: [], warnings, result: { ...A, meta, settings: s, date: new Date() } };
   }
   const rawStr = v => (state.lang === 'fr' ? String(v).replace('.', ',') : String(v));
 
   /* calculerResultat */
-  function calculer(xRaw, methodC, methodU, confirmed) {
+  function calculer(xRaw, methodC, confirmed) {
     try {
-      return { ...Core.calculer(state.analysis, state.analysis.meta, xRaw, methodC, methodU, confirmed), time: new Date() };
+      return { ...Core.calculer(state.analysis, state.analysis.meta, xRaw, methodC, confirmed), time: new Date() };
     } catch (err) {
       throw new Error(err.code ? coreMessage(err.code, err.params) : err.message);
     }
@@ -445,7 +479,8 @@
     const raw = span / count, mag = 10 ** Math.floor(Math.log10(raw)), n = raw / mag;
     const step = (n < 1.5 ? 1 : n < 3 ? 2 : n < 7 ? 5 : 10) * mag;
     const out = [];
-    for (let v = Math.ceil(min / step) * step; v <= max + step * 1e-6; v += step) out.push(+v.toPrecision(12));
+    // Graduation calculée par multiples entiers du pas (pas d'accumulation d'erreur : 0 reste 0).
+    for (let i = Math.ceil(min / step); i * step <= max + step * 1e-6; i++) out.push(i === 0 ? 0 : +(i * step).toPrecision(12));
     return out;
   }
   function domain(vals, padFrac = 0.08) {
@@ -611,33 +646,97 @@
     inp.min = A.lo; inp.max = A.hi;
     if (inp.value === '') inp.value = +((A.lo + A.hi) / 2).toPrecision(10);
     $('c-lo').textContent = 'min ' + fmt(A.lo); $('c-hi').textContent = 'max ' + fmt(A.hi);
-    renderResult(); renderHistory();
+    liveCalc(); renderHistory();
   }
+  /* Affichage métrologique : U à 2 chiffres significatifs arrondie vers le haut ; C et I + C avec
+   * le même nombre de décimales que U prudente. Les valeurs non arrondies restent visibles. */
+  function fixed(v, decimals) {
+    const r = Number(v.toFixed(decimals));
+    const locale = state.lang === 'fr' ? 'fr-FR' : 'en-US';
+    return new Intl.NumberFormat(locale, { minimumFractionDigits: decimals, maximumFractionDigits: decimals, useGrouping: false })
+      .format(r === 0 ? 0 : r);
+  }
+  function displayResult(R) {
+    const ru = Core.arrondirIncertitude(R.uPrudent);
+    const rf = R.uFitOk ? Core.arrondirIncertitude(R.uFit) : null;
+    const dec = ru.decimals;
+    return {
+      C: (R.C > 0 ? '+' : '') + fixed(R.C, dec), corrected: fixed(R.corrected, dec),
+      uPrudent: fixed(ru.value, ru.decimals), uFit: rf ? fixed(rf.value, rf.decimals) : null,
+    };
+  }
+  const isExpired = m => !!m.validUntil && m.validUntil < new Date().toISOString().slice(0, 10);
+
   function renderResult() {
     const A = state.analysis, R = state.lastResult, el = $('calcResult');
-    if (!R) { el.innerHTML = `<p class="help" style="font-size:13.5px">${t('calc.empty')}</p>`; return; }
-    const uI = A.meta.unitI || A.meta.unitC, uU = A.meta.unitU;
-    el.innerHTML = `
+    const m = A.meta;
+    const expired = isExpired(m)
+      ? `<div class="alert err" style="margin-bottom:12px">${icon('xcircle')}<span>${t('calc.expired', { d: esc(m.validUntil) })}</span></div>` : '';
+    if (!R) { el.innerHTML = `${expired}<p class="help" style="font-size:13.5px">${t('calc.empty')}</p>`; return; }
+    const uI = m.unitI || m.unitC, uU = m.uncType === 'relative' ? m.unitI : m.unitU;
+    const D = displayResult(R);
+    const k = esc(m.k || '—') + (state.kVerified ? '' : ` <span class="pill warn">${t('k.verify')}</span>`);
+    el.innerHTML = `${expired}
       <div class="result-hero">
         <div class="r-label">${t('calc.corrected')}</div>
-        <div class="r-value">${fmt(R.corrected)} <small>± ${fmt(R.U)} ${esc(uI)}</small></div>
+        <div class="r-value">${D.corrected} <small>± ${D.uPrudent} ${esc(uI)}</small></div>
+        <div class="help" style="margin-top:4px">${t('calc.heroNote', { k })}</div>
       </div>
-      <div class="r-grid">
-        <div class="kpi"><div class="k-label">${t('calc.indication')}</div><div class="k-value">${fmt(R.x)}${unit(uI)}</div></div>
-        <div class="kpi"><div class="k-label">${t('calc.correction')}</div><div class="k-value">${R.C < 0 ? '' : '+'}${fmt(R.C)}${unit(A.meta.unitC || uI)}</div></div>
-        <div class="kpi"><div class="k-label">${t('calc.uncertainty')} (${esc(R.nature)})</div><div class="k-value">${fmt(R.U)}${unit(uU)}</div></div>
+      <div class="r-grid r-grid-2">
+        <div class="kpi"><div class="k-label">${t('calc.correction')} C(I)</div><div class="k-value">${D.C}${unit(m.unitC || uI)}</div></div>
+        <div class="kpi"><div class="k-label">${t('calc.corrected')}</div><div class="k-value">${D.corrected}${unit(uI)}</div></div>
+        <div class="kpi"><div class="k-label">${t('calc.uFit')} (k = ${esc(m.k || '—')})</div>
+          <div class="k-value">${D.uFit ?? `<span style="color:var(--err);font-size:13px">${t('calc.uFitNeg')}</span>`}${D.uFit ? unit(uU) : ''}</div></div>
+        <div class="kpi kpi-reco"><div class="k-label">${t('calc.uPrudent')} <span class="pill ok">${t('calc.recommended')}</span></div>
+          <div class="k-value">${D.uPrudent}${unit(uU)}</div></div>
       </div>
+      <dl class="stats" style="margin-top:12px">
+        <div><dt>${t('f.certificate')}</dt><dd>${esc(m.certificate || '—')}</dd></div>
+        <div><dt>${t('calc.validRange')}</dt><dd>${fmt(A.lo)} → ${fmt(A.hi)}</dd></div>
+        <div><dt>${t('calc.resMaxC')}</dt><dd>${fmt(A.c.residuMax)}</dd></div>
+        <div><dt>${t('calc.exact')}</dt><dd title="C = ${fmt(R.C)} ; U = ${fmt(R.uPrudent)}">C ${fmt(R.C, 6)} · Up ${fmt(R.uPrudent, 6)}</dd></div>
+      </dl>
+      <div class="toolbar" style="margin-top:12px">
+        <button class="btn" type="button" id="copyResultBtn">${icon('doc')}<span>${t('btn.copy')}</span></button>
+      </div>
+      <details class="formulas">
+        <summary>${t('calc.formulas')}</summary>
+        <ul dir="ltr">
+          <li>C(I) = a<sub>C</sub> · I + b<sub>C</sub> = ${fmt(A.c.a)} · I ${signed(A.c.b)}${R.methodC === 'interpolation' ? ` <i>(${t('method.interpolation')})</i>` : ''}</li>
+          <li>I<sub>corr</sub> = I + C(I)</li>
+          <li>U(I) = a<sub>U</sub> · I + b<sub>U</sub> = ${fmt(A.u.a)} · I ${signed(A.u.b)}</li>
+          <li>U<sub>p</sub>(I) = U(I) + max|e<sub>U</sub>| = U(I) + ${fmt(A.u.residuMax)}</li>
+          <li>e<sub>i</sub> = y<sub>i</sub> − (a · x<sub>i</sub> + b)</li>
+        </ul>
+        <p class="help">${t('calc.formulasNote')}</p>
+      </details>
       <p class="sub-title">${t('model.correction')}</p>
       <div class="chart" id="calcChart"></div>
-      <p class="note">${icon('info', 14)}<span>${t('calc.note')} · ${t('method.' + R.methodC)} / ${t('method.' + R.methodU)}</span></p>`;
+      <p class="note">${icon('info', 14)}<span>${t('calc.note')} · ${t('method.' + R.methodC)}</span></p>`;
     modelChart($('calcChart'), A, 'c', { height: 210, marker: { x: R.x, y: R.C } });
+    $('copyResultBtn').addEventListener('click', () => copyResult(R, D, uI, uU));
+  }
+  function copyResult(R, D, uI, uU) {
+    const m = state.analysis.meta;
+    const txt = [
+      `${t('calc.indication')} : ${fmt(R.x)} ${uI}`,
+      `${t('calc.correction')} C(I) : ${D.C} ${m.unitC || uI}`,
+      `${t('calc.corrected')} : ${D.corrected} ${uI}`,
+      `${t('calc.uPrudent')} : ${D.uPrudent} ${uU} (k = ${m.k || '—'}${state.kVerified ? '' : ', ' + t('k.verify')})`,
+      `${t('calc.uFit')} : ${D.uFit ?? t('calc.uFitNeg')} ${D.uFit ? uU : ''}`,
+      `${t('f.certificate')} : ${m.certificate || '—'} · ${t('calc.validRange')} : ${fmt(state.analysis.lo)} → ${fmt(state.analysis.hi)}`,
+    ].join('\n');
+    navigator.clipboard?.writeText(txt).then(() => toast(t('toast.copied')), () => toast(t('err.copy')));
   }
   function historyTable(rows, compact = false) {
     if (!rows.length) return `<tbody><tr><td class="help" style="text-align:center;padding:18px">${t('calc.historyEmpty')}</td></tr></tbody>`;
-    return `<thead><tr><th>#</th><th>${t('calc.indication')}</th><th>${t('calc.correction')}</th><th>${t('calc.corrected')}</th><th>${t('calc.uncertainty')}</th>${compact ? '' : `<th>${t('calc.method')}</th>`}</tr></thead><tbody>` +
-      rows.map((r, i) => `<tr><td class="num-cell">${i + 1}</td><td class="num-cell">${fmt(r.x)}</td><td class="num-cell">${fmt(r.C)}</td>
-        <td class="num-cell"><b>${fmt(r.corrected)}</b></td><td class="num-cell">${fmt(r.U)} (${esc(r.nature)})</td>
-        ${compact ? '' : `<td style="font-size:12px;color:var(--text-3)">${t('method.' + r.methodC)} · ${t('method.' + r.methodU)}</td>`}</tr>`).join('') +
+    return `<thead><tr><th>#</th><th>${t('calc.indication')}</th><th>${t('calc.correction')}</th><th>${t('calc.corrected')}</th><th>${t('calc.uPrudent')}</th>${compact ? '' : `<th>${t('calc.method')}</th>`}</tr></thead><tbody>` +
+      rows.map((r, i) => {
+        const D = displayResult(r);
+        return `<tr><td class="num-cell">${i + 1}</td><td class="num-cell">${fmt(r.x)}</td><td class="num-cell">${D.C}</td>
+        <td class="num-cell"><b>${D.corrected}</b></td><td class="num-cell">${D.uPrudent} (${esc(r.nature)}, k = ${esc(r.k || '—')})</td>
+        ${compact ? '' : `<td style="font-size:12px;color:var(--text-3)">${t('method.' + r.methodC)}</td>`}</tr>`;
+      }).join('') +
       '</tbody>';
   }
   function renderHistory() {
@@ -754,15 +853,21 @@
     persist();
   }
 
-  function runCalc() {
+  /* Calcul instantané à la saisie ; le bouton ajoute le résultat affiché à l'historique. */
+  function liveCalc() {
+    if (!state.analysis) return;
     $('calcAlerts').innerHTML = '';
     try {
-      const r = calculer($('c-input').value, $('c-methodC').value, $('c-methodU').value, $('c-confirm').checked);
-      state.lastResult = r; state.history.push(r);
-      renderResult(); renderHistory();
+      state.lastResult = calculer($('c-input').value, $('c-methodC').value, $('c-confirm').checked);
     } catch (err) {
+      state.lastResult = null;
       $('calcAlerts').innerHTML = alertsHtml([err.message], 'err');
     }
+    renderResult();
+  }
+  function runCalc() {
+    liveCalc();
+    if (state.lastResult) { state.history.push(state.lastResult); renderHistory(); }
   }
 
   const EXAMPLE = [['0', '0,1', '0,2'], ['10', '0,2', '0,22'], ['20', '0,3', '0,24'], ['30', '0,4', '0,26']];
@@ -773,6 +878,8 @@
     $('m-certificate').value = 'CE-2026-0142';
     $('m-unitI').value = '°C'; $('m-unitC').value = '°C'; $('m-unitU').value = '°C';
     $('m-nature').value = 'U';
+    $('m-k').value = '2'; $('m-uncType').value = 'absolute';
+    state.kVerified = true; updateKPill(); // jeu d'exemple : k = 2 fait partie des données
     updateUnits(); changed();
   }
 
@@ -884,7 +991,7 @@
       if (!nums.every(Number.isFinite) || !Number.isFinite(U)) return;
       const { ref, eq, err, ok } = Core.ligneCertificat(nums, U);
       if (!current) { current = { title: t('series') + ' 1', unit: '', points: [], inconsistent: false }; series.push(current); }
-      current.points.push({ ref, eq, err, x: eq, c: -err, u: Math.abs(U), ok });
+      current.points.push({ ref, eq, err, x: eq, c: -err, u: Math.abs(U), ok, k: tokens[iU + 1]?.v ?? NaN });
       if (!ok) current.inconsistent = true;
     });
     const full = rows.join('\n');
@@ -949,6 +1056,12 @@
       $('m-certificate').value = m.certificate; $('m-lab').value = m.lab; $('m-date').value = m.date;
       ['unitI', 'unitC', 'unitU'].forEach(f => { $('m-' + f).value = s.unit; });
       if (m.nature) $('m-nature').value = m.nature;
+      // k seulement s'il est imprimé, identique, sur chaque ligne de la série ; sinon 2 « à vérifier ».
+      const ks = s.points.map(p => p.k);
+      const kCert = ks.every(v => Number.isFinite(v) && Math.abs(v - ks[0]) < 1e-9) ? ks[0] : NaN;
+      $('m-k').value = Number.isFinite(kCert) ? rawStr(kCert) : '2';
+      state.kVerified = Number.isFinite(kCert); updateKPill();
+      $('m-uncType').value = 'absolute';
       updateUnits(); changed();
       dlg.close();
       go('data');
@@ -975,7 +1088,7 @@
   const slug = () => (readMeta().certificate || readMeta().instrument || 'etalonnage').replace(/[^\w\-]+/g, '_').slice(0, 40) || 'etalonnage';
 
   function snapshot() {
-    return { schema: 1, app: 'AnalyseurEtalonnage-web', meta: readMeta(), points: rawRows(), settings: readSettings() };
+    return { schema: 1, app: 'AnalyseurEtalonnage-web', meta: readMeta(), kVerified: state.kVerified, points: rawRows(), settings: readSettings() };
   }
   /* Session ou stockage local : données non fiables, on n'accepte que des chaînes courtes et un nombre borné de points. */
   const MAX_POINTS = 500;
@@ -985,6 +1098,11 @@
     const meta = s.meta && typeof s.meta === 'object' ? s.meta : {};
     META_FIELDS.forEach(f => { $('m-' + f).value = str(meta[f]); });
     if (!['', 'U', 'u'].includes($('m-nature').value)) $('m-nature').value = '';
+    if (!['absolute', 'relative'].includes($('m-uncType').value)) $('m-uncType').value = 'absolute';
+    // k : 2 par défaut, mais signalé « à vérifier » tant qu'il ne vient pas du certificat ou de l'utilisateur.
+    state.kVerified = s.kVerified === true && $('m-k').value.trim() !== '';
+    if (!$('m-k').value.trim()) { $('m-k').value = '2'; state.kVerified = false; }
+    updateKPill();
     const st = s.settings && typeof s.settings === 'object' ? s.settings : {};
     ['alphaC', 'alphaU', 'limitC', 'limitU'].forEach(k => { if (st[k] != null) $('s-' + k).value = str(st[k], 40); });
     setMode(st.mode === 'absolute' ? 'absolute' : 'fraction');
@@ -1004,11 +1122,11 @@
       ['Modele', 'a', 'b', 'R2', 'Residu_max', 's_res', 'Seuil', 'Decision'].join(';'),
       ['Correction', d(A.c.a), d(A.c.b), d(A.c.R2), d(A.c.residuMax), d(A.c.sRes), d(A.sC), A.decC.ok ? 'Acceptable' : 'Non representatif'].join(';'),
       ['Incertitude', d(A.u.a), d(A.u.b), d(A.u.R2), d(A.u.residuMax), d(A.u.sRes), d(A.sU), A.decU.ok ? 'Acceptable' : 'Non representatif'].join(';'),
-      ['Majorante', d(A.maj.a), d(A.maj.b), '', '', '', '', A.maj.usable ? 'Utilisable' : 'Non utilisable'].join(';'),
+      ['U_prudente (majorante)', d(A.maj.a), d(A.maj.b), '', '', '', '', A.maj.usable ? 'Utilisable' : 'Non utilisable'].join(';'),
     ];
     if (state.history.length) {
-      lines.push('', ['Calcul_indication', 'Correction', 'Valeur_corrigee', 'Incertitude', 'Nature', 'Methode_C', 'Methode_U'].join(';'));
-      state.history.forEach(r => lines.push([d(r.x), d(r.C), d(r.corrected), d(r.U), r.nature, r.methodC, r.methodU].join(';')));
+      lines.push('', ['Calcul_indication', 'Correction', 'Valeur_corrigee', 'U_modelisee', 'U_prudente', 'k', 'Nature', 'Methode_C'].join(';'));
+      state.history.forEach(r => lines.push([d(r.x), d(r.C), d(r.corrected), r.uFitOk ? d(r.uFit) : 'non exploitable', d(r.uPrudent), r.k, r.nature, r.methodC].join(';')));
     }
     download(`${slug()}_analyse.csv`, '﻿' + lines.join('\r\n'), 'text/csv;charset=utf-8');
     toast(t('toast.csv'));
@@ -1056,7 +1174,11 @@
   $('analyzeBtn').addEventListener('click', runAnalysis);
   $('calcBtn').addEventListener('click', runCalc);
   $('c-input').addEventListener('keydown', e => { if (e.key === 'Enter') runCalc(); });
-  $('clearHistoryBtn').addEventListener('click', () => { state.history = []; state.lastResult = null; renderResult(); renderHistory(); });
+  $('clearHistoryBtn').addEventListener('click', () => { state.history = []; renderHistory(); });
+  $('c-input').addEventListener('input', liveCalc);
+  $('c-methodC').addEventListener('change', liveCalc);
+  $('c-confirm').addEventListener('change', liveCalc);
+  $('m-k').addEventListener('input', () => { state.kVerified = $('m-k').value.trim() !== ''; updateKPill(); });
   $('importBtn').addEventListener('click', () => $('csvFile').click());
   $('csvFile').addEventListener('change', e => { const f = e.target.files[0]; if (f) importFile(f); e.target.value = ''; });
   $('saveSessionBtn').addEventListener('click', () => {
@@ -1074,6 +1196,13 @@
     });
   });
   $('csvBtn').addEventListener('click', exportCsv);
+  $('xlsxBtn').addEventListener('click', () => {
+    const A = state.analysis;
+    if (!A) return;
+    const bytes = window.EtalonnageXlsx.build(A, A.meta, { kVerified: state.kVerified });
+    download(window.EtalonnageXlsx.fileName(A.meta), bytes, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    toast(t('toast.excel'));
+  });
   $('printBtn').addEventListener('click', () => window.print());
 
   const card = $('pointsCard');
@@ -1109,7 +1238,9 @@
   } else {
     setRows([]);
     setMode('fraction');
+    state.kVerified = false; // k = 2 pré-rempli, à vérifier
   }
+  updateKPill();
   applyTheme();
   applyLang();
   renderTabs();

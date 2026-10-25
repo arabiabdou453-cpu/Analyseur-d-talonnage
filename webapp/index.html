@@ -101,6 +101,16 @@
                   <option value="u" data-i18n="nature.standard"></option>
                 </select>
               </label>
+              <label class="field"><span><span data-i18n="f.k"></span> <span class="pill warn" id="kVerifyPill" data-i18n="k.verify" hidden></span></span>
+                <input id="m-k" inputmode="decimal" autocomplete="off" value="2">
+              </label>
+              <label class="field"><span data-i18n="f.uncType"></span>
+                <select id="m-uncType">
+                  <option value="absolute" data-i18n="unc.absolute"></option>
+                  <option value="relative" data-i18n="unc.relative"></option>
+                </select>
+              </label>
+              <label class="field"><span data-i18n="f.validUntil"></span><input id="m-validUntil" type="date"></label>
             </div>
           </div>
 
@@ -191,11 +201,8 @@
               <label class="field"><span data-i18n="f.methodC"></span>
                 <select id="c-methodC"><option value="regression" data-i18n="method.regression"></option><option value="interpolation" data-i18n="method.interpolation"></option></select>
               </label>
-              <label class="field"><span data-i18n="f.methodU"></span>
-                <select id="c-methodU"><option value="majorant" data-i18n="method.majorant"></option><option value="fitted" data-i18n="method.fitted"></option></select>
-              </label>
               <label class="check"><input type="checkbox" id="c-confirm"><span data-i18n="calc.confirm"></span></label>
-              <button class="btn primary lg" id="calcBtn" type="button"><span class="ico" data-ico="calc"></span><span data-i18n="btn.calculate"></span></button>
+              <button class="btn lg" id="calcBtn" type="button"><span class="ico" data-ico="list"></span><span data-i18n="btn.addHistory"></span></button>
               <div class="alerts" id="calcAlerts" style="margin:0"></div>
             </div>
           </div>
@@ -221,6 +228,7 @@
       <div class="page-head">
         <div><h1 data-i18n="rep.h"></h1><p data-i18n="rep.p"></p></div>
         <div class="toolbar no-print" id="reportActions">
+          <button class="btn primary" id="xlsxBtn" type="button"><span class="ico" data-ico="table"></span><span data-i18n="btn.excel"></span></button>
           <button class="btn" id="csvBtn" type="button"><span class="ico" data-ico="download"></span><span data-i18n="btn.exportCsv"></span></button>
           <button class="btn primary" id="printBtn" type="button"><span class="ico" data-ico="printer"></span><span data-i18n="btn.print"></span></button>
         </div>
@@ -236,6 +244,7 @@
   <input type="file" id="csvFile" accept=".csv,.txt,.pdf,text/csv,application/pdf" hidden>
   <input type="file" id="sessionFile" accept=".json,application/json" hidden>
   <script src="core.js"></script>
+  <script src="xlsx.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
