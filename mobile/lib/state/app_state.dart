@@ -281,14 +281,12 @@ class AppState extends ChangeNotifier {
 
   // ---------- Calculateur ----------
   final TextEditingController calcInput = TextEditingController();
-  CorrectionMethod methodC = CorrectionMethod.regression;
   bool confirmed = false;
   CoreError? calcError;
   CalcResult? lastResult;
   final List<CalcResult> history = [];
 
-  void setCalcOptions({CorrectionMethod? c, bool? confirm}) {
-    methodC = c ?? methodC;
+  void setCalcOptions({bool? confirm}) {
     confirmed = confirm ?? confirmed;
     liveCalc();
   }
@@ -298,7 +296,8 @@ class AppState extends ChangeNotifier {
     final a = analysis;
     if (a == null) return;
     try {
-      lastResult = calculer(a, analysisMeta!, calcInput.text, methodC, confirmed: confirmed);
+      // Toujours la régression linéaire (pas de choix de méthode).
+      lastResult = calculer(a, analysisMeta!, calcInput.text, CorrectionMethod.regression, confirmed: confirmed);
       calcError = null;
     } on CoreError catch (e) {
       lastResult = null;

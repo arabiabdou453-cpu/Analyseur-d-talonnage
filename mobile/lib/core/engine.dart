@@ -84,8 +84,7 @@ double _sum(Iterable<double> v) => v.fold(0.0, (s, e) => s + e);
 /// (pas d'inversion de matrice).
 LinearFit ajusterDroite(List<double> x, List<double> y) {
   final n = x.length;
-  // n = 2 accepté (droite exacte, résidu nul, non représentatif : averti par valider) ; n < 2 impossible.
-  if (n < 2 || n != y.length || ![...x, ...y].every((v) => v.isFinite)) {
+  if (n < 3 || n != y.length || ![...x, ...y].every((v) => v.isFinite)) {
     throw const CoreError('fitInput');
   }
   final xc = _sum(x) / n, yc = _sum(y) / n;
@@ -113,8 +112,7 @@ LinearFit ajusterDroite(List<double> x, List<double> y) {
     sse: sse,
     sst: sst,
     r2: constant ? double.nan : 1 - sse / sst,
-    // s_res = √(SSE/(n−2)) : non défini pour n = 2 (aucun degré de liberté).
-    sRes: n > 2 ? math.sqrt(sse / (n - 2)) : double.nan,
+    sRes: math.sqrt(sse / (n - 2)),
     n: n,
     constant: constant,
   );
@@ -251,7 +249,7 @@ Validation valider(List<List<String>> rows, Settings settings, [Meta meta = cons
     if (v[2] < 0) errors.add(Issue('negU', {'row': i + 1}, (i, 2)));
     pts.add(Point(v[0], v[1], relative ? v[2] * v[0].abs() / 100 : v[2], v[2]));
   }
-  if (pts.length < 2) errors.insert(0, const Issue('minPoints'));
+  if (pts.length < 3) errors.insert(0, const Issue('minPoints'));
   if (errors.isEmpty) {
     outer:
     for (var i = 0; i < pts.length; i++) {
@@ -285,7 +283,6 @@ Validation valider(List<List<String>> rows, Settings settings, [Meta meta = cons
   }
   if (errors.isEmpty) {
     if (pts.any((p) => p.u == 0)) warnings.add('warn.zeroU');
-    if (pts.length == 2) warnings.add('warn.two');
     if (pts.length == 3) warnings.add('warn.three');
     if (meta.unitI.isNotEmpty && meta.unitC.isNotEmpty && meta.unitI.trim() != meta.unitC.trim()) {
       warnings.add('warn.units');
@@ -375,29 +372,28 @@ class CalcResult {
     required this.c,
     required this.corrected,
     required this.uFit,
-    required this.uFitOk,
     required this.uPrudent,
     required this.methodC,
     required this.nature,
     required this.k,
   });
-  final double x, c, corrected, uFit, uPrudent;
 
-  /// Faux si l'U modélisée est négative au point ou à une borne : jamais remplacée par 0.
-  final bool uFitOk;
+  /// [uFit] : incertitude U(I) affichée ; [uPrudent] : conservée pour le rapport uniquement.
+  final double x, c, corrected, uFit, uPrudent;
   final CorrectionMethod methodC;
   final String nature, k;
 
-  /// Incertitude recommandée (U prudente).
-  double get u => uPrudent;
+  /// Incertitude affichée U(I).
+  double get u => uFit;
 }
 
 /// calculerResultat : même ordre de contrôles que la version MATLAB.
-///   Correction  C(I)  = a_C · I + b_C   (ou interpolation point par point, au choix explicite)
+///   Correction  C(I)  = a_C · I + b_C
 ///   Valeur corrigée   = I + C(I)
-///   U modélisée U(I)  = a_U · I + b_U
-///   U prudente  Up(I) = U(I) + résidu max de la modélisation (recommandée ; = droite majorante)
-/// Sécurité : hors étendue, U prudente négative, nature inconnue ou unités incompatibles → bloqué.
+///   Incertitude U(I)  = a_U · I + b_U   (valeur affichée)
+///   U prudente  Up(I) = U(I) + résidu max (conservée pour le rapport uniquement)
+/// Sécurité : hors étendue, U(I) négative (au point ou à une borne), nature inconnue ou
+/// unités incompatibles → bloqué. Une incertitude négative n'est jamais remplacée par 0.
 CalcResult calculer(Analysis a, Meta meta, Object xRaw, CorrectionMethod methodC, {required bool confirmed}) {
   if (!confirmed) throw const CoreError('confirm');
   final x = xRaw is double ? xRaw : parseNum(xRaw.toString());
@@ -405,10 +401,9 @@ CalcResult calculer(Analysis a, Meta meta, Object xRaw, CorrectionMethod methodC
   if (x < a.lo || x > a.hi) throw CoreError('outOfRange', {'lo': a.lo, 'hi': a.hi});
   final c = methodC == CorrectionMethod.regression ? a.c.at(x) : interpolation(x, a.pts);
   if (!a.maj.usable) throw const CoreError('majorant');
-  final uPrudent = a.maj.at(x);
-  if (!uPrudent.isFinite || uPrudent < 0) throw const CoreError('negModel');
   final uFit = a.u.at(x);
-  final uFitOk = uFit.isFinite && uFit >= 0 && a.u.at(a.lo) >= 0 && a.u.at(a.hi) >= 0;
+  if (!uFit.isFinite || uFit < 0 || a.u.at(a.lo) < 0 || a.u.at(a.hi) < 0) throw const CoreError('negModel');
+  final uPrudent = a.maj.at(x);
   if (meta.nature.isEmpty) throw const CoreError('nature');
   if (meta.unitI.isNotEmpty && meta.unitI.trim() != meta.unitC.trim()) throw const CoreError('unitsCalc');
   return CalcResult(
@@ -416,7 +411,6 @@ CalcResult calculer(Analysis a, Meta meta, Object xRaw, CorrectionMethod methodC
     c: c,
     corrected: x + c,
     uFit: uFit,
-    uFitOk: uFitOk,
     uPrudent: uPrudent,
     methodC: methodC,
     nature: meta.nature,

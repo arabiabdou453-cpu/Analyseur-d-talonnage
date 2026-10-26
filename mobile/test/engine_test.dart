@@ -124,16 +124,8 @@ void main() {
       ['10', '.2', '.3'],
       ['20', '.3', '.4'],
     ];
-    test('1 point refusé (n < 2)', () {
-      expect(valider([['0', '.1', '.2']], fraction).errors.first.code, 'minPoints');
-    });
-    test('2 points acceptés avec avertissement : droite exacte, s_res non défini', () {
-      final v = valider([['0', '.1', '.2'], ['10', '.2', '.3']], fraction);
-      expect(v.errors, isEmpty);
-      expect(v.warnings, contains('warn.two'));
-      final a = analyser(v.pts, v.sC, v.sU);
-      expect(a.c.residuMax, lessThan(1e-12));
-      expect(a.c.sRes.isNaN, isTrue);
+    test('2 points refusés (minimum 3)', () {
+      expect(valider([['0', '.1', '.2'], ['10', '.2', '.3']], fraction).errors.first.code, 'minPoints');
     });
     test('doublons refusés', () {
       expect(has(valider([['10', '.1', '.2'], ['10', '.2', '.3'], ['10', '.3', '.4']], fraction), 'dup'), isTrue);
@@ -197,10 +189,8 @@ void main() {
       expect(a.u.a, closeTo(.05, _t));
       expect(a.u.b, closeTo(-1 / 6, _t));
     });
-    test('U modélisée négative : non exploitable, jamais remplacée par 0', () {
-      final r = calculer(a, meta, 15.0, CorrectionMethod.regression, confirmed: true);
-      expect(r.uFitOk, isFalse);
-      expect(r.uPrudent, greaterThanOrEqualTo(0));
+    test('U(I) négative à une borne : calcul bloqué, jamais remplacée par 0', () {
+      expect(() => calculer(a, meta, 15.0, CorrectionMethod.regression, confirmed: true), throwsCode('negModel'));
     });
     test('majorante utilisable', () => expect(a.maj.usable, isTrue));
   });

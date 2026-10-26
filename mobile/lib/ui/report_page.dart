@@ -128,13 +128,6 @@ class ReportPage extends StatelessWidget {
                   await Printing.layoutPdf(onLayout: (_) async => bytes, name: '${stem}_rapport.pdf');
                 }),
               ),
-              OutlinedButton.icon(
-                icon: const Icon(Icons.grid_on_outlined),
-                label: Text(s.t('btn.exportCsv')),
-                onPressed: () => _run(context, () async {
-                  await shareBytes(Uint8List.fromList(utf8.encode(exportCsv(a, s.history))), '${stem}_analyse.csv', 'text/csv');
-                }),
-              ),
             ]),
             const SizedBox(height: 12),
             AlertBox(s.t('rep.foot'), tone: Tone.warn),

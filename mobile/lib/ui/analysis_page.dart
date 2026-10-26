@@ -49,8 +49,6 @@ class AnalysisPage extends StatelessWidget {
           children: [
             Kpi(label: s.t('kpi.points'), value: '${a.pts.length}'),
             Kpi(label: s.t('kpi.range'), value: '${n(a.lo)} – ${n(a.hi)}', unit: m.unitI),
-            Kpi(label: s.t('kpi.thrC'), value: n(a.sC), unit: m.unitC),
-            Kpi(label: s.t('kpi.thrU'), value: n(a.sU), unit: m.unitU),
           ],
         ),
         const SizedBox(height: 8),
@@ -125,10 +123,8 @@ class _ModelCard extends StatelessWidget {
         KpiGrid(
           spacing: 6,
           children: [
-            Kpi(label: s.t('st.r2'), value: n(m.r2, 6)),
+            Kpi(label: s.t('st.r2'), value: n(m.r2, r2Digits)),
             Kpi(label: s.t('st.maxRes'), value: n(m.residuMax)),
-            Kpi(label: s.t('st.sres'), value: n(m.sRes)),
-            Kpi(label: s.t('st.thr'), value: n(d.seuil)),
           ],
         ),
         const SizedBox(height: 12),

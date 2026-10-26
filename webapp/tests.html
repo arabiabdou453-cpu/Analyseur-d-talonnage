@@ -84,11 +84,7 @@
     // validationEtSeuils
     {
       const s = { mode: 'fraction', alphaC: '0.25', alphaU: '0.25' };
-      log(K.valider([['0', '.1', '.2']], s).errors[0]?.code === 'minPoints', 'Validation: 1 point refusé (n < 2)');
-      const v2 = K.valider([['0', '.1', '.2'], ['10', '.2', '.3']], s);
-      log(!v2.errors.length && v2.warnings.includes('warn.two'), 'Validation: 2 points acceptés avec avertissement');
-      const A2 = K.analyser(v2.pts, v2.sC, v2.sU);
-      log(A2.c.residuMax < 1e-12 && Number.isNaN(A2.c.sRes), 'n = 2 : droite exacte, résidu nul, s_res non défini');
+      log(K.valider([['0', '.1', '.2'], ['10', '.2', '.3']], s).errors[0]?.code === 'minPoints', 'Validation: 2 points refusés (minimum 3)');
       log(K.valider([['10', '.1', '.2'], ['10', '.2', '.3'], ['10', '.3', '.4']], s).errors.some(e => e.code === 'dup'), 'Validation: doublons refusés');
       log(K.valider([['0', '.1', '.2'], ['10', '.2', '-.1'], ['20', '.3', '.4']], s).errors.some(e => e.code === 'negU'), 'Validation: U négative refusée');
       log(K.valider([['0', '.1', '.2'], ['10', 'abc', '.3'], ['20', '.3', '.4']], s).errors.some(e => e.code === 'nan'), 'Validation: texte refusé (pas de zéro silencieux)');
@@ -121,9 +117,7 @@
     {
       const A = K.analyser(pts([0, 10, 20], [0, 0, 0], [0, 0, 1]), 1, 1);
       near('U ajustée: a', A.u.a, .05); near('U ajustée: b', A.u.b, -1 / 6);
-      const r = K.calculer(A, meta, 15, 'regression', true);
-      log(r.uFitOk === false, 'U modélisée négative à une borne : signalée non exploitable (jamais remplacée par 0)');
-      log(r.uPrudent >= 0, 'U prudente (recommandée) reste exploitable');
+      throwsCode('U(I) négative à une borne : calcul bloqué (jamais remplacée par 0)', () => K.calculer(A, meta, 15, 'regression', true), 'negModel');
       log(A.maj.usable, 'Majorante utilisable (>= U >= 0 aux bornes)');
     }
     // Cas de test du cahier des charges CalibFit (tolérance 1e-6)

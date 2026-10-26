@@ -39,33 +39,6 @@ String _clip(Object? v, int max) {
   return s.length > max ? s.substring(0, max) : s;
 }
 
-String _d(double v) => v.isFinite ? double.parse(v.toStringAsPrecision(12)).toString().replaceAll('.', ',') : '';
-
-/// Export CSV (séparateur « ; », virgule décimale, BOM UTF-8 pour Excel).
-String exportCsv(Analysis a, List<CalcResult> history) {
-  final b = StringBuffer('﻿');
-  void row(List<Object> cells) => b.write('${cells.join(';')}\r\n');
-  row(['Indication', 'Correction', 'Incertitude', 'C_ajustee', 'Residu_C', 'U_ajustee', 'Residu_U', 'U_majorante']);
-  for (var i = 0; i < a.pts.length; i++) {
-    final p = a.pts[i];
-    row([p.x, p.c, p.u, a.c.ajuste[i], a.c.residu[i], a.u.ajuste[i], a.u.residu[i], a.maj.at(p.x)].map(_d).toList());
-  }
-  row(['']);
-  row(['Modele', 'a', 'b', 'R2', 'Residu_max', 's_res', 'Seuil', 'Decision']);
-  String dec(Decision d) => d.ok ? 'Acceptable' : 'Non representatif';
-  row(['Correction', _d(a.c.a), _d(a.c.b), _d(a.c.r2), _d(a.c.residuMax), _d(a.c.sRes), _d(a.sC), dec(a.decC)]);
-  row(['Incertitude', _d(a.u.a), _d(a.u.b), _d(a.u.r2), _d(a.u.residuMax), _d(a.u.sRes), _d(a.sU), dec(a.decU)]);
-  row(['U_prudente (majorante)', _d(a.maj.a), _d(a.maj.b), '', '', '', '', a.maj.usable ? 'Utilisable' : 'Non utilisable']);
-  if (history.isNotEmpty) {
-    row(['']);
-    row(['Calcul_indication', 'Correction', 'Valeur_corrigee', 'U_modelisee', 'U_prudente', 'k', 'Nature', 'Methode_C']);
-    for (final r in history) {
-      row([_d(r.x), _d(r.c), _d(r.corrected), r.uFitOk ? _d(r.uFit) : 'non exploitable', _d(r.uPrudent), r.k, r.nature, r.methodC.name]);
-    }
-  }
-  return b.toString();
-}
-
 class Session {
   const Session(this.meta, this.settings, this.points, {this.kVerified = false});
   final Meta meta;

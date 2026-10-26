@@ -22,7 +22,7 @@
       'col.fitC': 'C ملائم', 'col.resC': 'باقي C', 'col.fitU': 'U ملائم', 'col.resU': 'باقي U',
       'btn.example': 'مثال', 'btn.import': 'استيراد CSV', 'btn.clear': 'مسح', 'btn.addRow': 'إضافة نقطة',
       'btn.analyze': 'تحليل البيانات', 'btn.saveSession': 'حفظ الجلسة', 'btn.loadSession': 'فتح جلسة',
-      'btn.calculate': 'احسب النتيجة', 'btn.exportCsv': 'تصدير CSV', 'btn.print': 'طباعة / PDF',
+      'btn.calculate': 'احسب النتيجة', 'btn.print': 'طباعة / PDF',
       'btn.goData': 'الانتقال إلى البيانات', 'btn.goAnalysis': 'عرض التحليل', 'btn.delRow': 'حذف النقطة',
       'meta.title': 'الجهاز والشهادة',
       'f.instrument': 'الجهاز', 'f.certificate': 'رقم الشهادة', 'f.date': 'تاريخ المعايرة', 'f.lab': 'المخبر',
@@ -41,9 +41,9 @@
       'verdict.ok': 'النموذجان مقبولان حسب معيار البواقي', 'verdict.ko': 'النموذجان غير ممثِّلين حسب معيار البواقي',
       'verdict.mixed': 'نموذج واحد فقط مقبول حسب معيار البواقي',
       'verdict.sub': 'حُلّلت {n} نقاط في المجال {lo} → {hi}. هذا الفحص لا يشكّل وحده مصادقة مترولوجية كاملة.',
-      'kpi.points': 'عدد النقاط', 'kpi.range': 'مجال المعايرة', 'kpi.thrC': 'عتبة التصحيح', 'kpi.thrU': 'عتبة عدم اليقين',
+      'kpi.points': 'عدد النقاط', 'kpi.range': 'مجال المعايرة',
       'model.correction': 'الاستيفاء (التصحيح)', 'model.uncertainty': 'النمذجة (عدم اليقين)', 'model.majorant': 'U الحذرة (الخط المحافظ)',
-      'st.r2': 'R²', 'st.maxRes': 'أكبر باقٍ', 'st.sres': 's_res', 'st.thr': 'العتبة',
+      'st.r2': 'R²', 'st.maxRes': 'أكبر باقٍ', 'st.thr': 'العتبة',
       'dec.ok': 'مقبول', 'dec.ko': 'غير ممثِّل',
       'r2.low': 'R² منخفض: ملاحظة إعلامية فقط، دون قاعدة رفض عامة.', 'r2.undef': 'R² غير معرّف: القيم ثابتة.',
       'r2.ok': 'R² مؤشر وصفي فقط.',
@@ -52,12 +52,12 @@
       'chart.residuals': 'البواقي', 'chart.residual': 'الباقي', 'chart.threshold': '± العتبة',
       'an.disclaimer': 'العتبات إعدادات أولية ولا تمثل قاعدة معيارية عامة. التفسير المترولوجي النهائي من مسؤولية المختص.',
       'calc.h': 'حاسبة النتيجة', 'calc.p': 'احسب القيمة المصححة وعدم اليقين لإشارة داخل مجال المعايرة فقط.',
-      'calc.form': 'المدخلات', 'f.inputI': 'الإشارة المقروءة', 'f.methodC': 'طريقة التصحيح', 'f.methodU': 'نموذج عدم اليقين',
-      'method.regression': 'الانحدار الخطي', 'method.interpolation': 'الاستيفاء بين النقاط',
+      'calc.form': 'المدخلات', 'f.inputI': 'الإشارة المقروءة', 'f.methodU': 'نموذج عدم اليقين',
+      'method.regression': 'الانحدار الخطي',
       'method.majorant': 'الخط المحافظ (Majorante)', 'method.fitted': 'الخط الملائم',
       'calc.confirm': 'أؤكد أنني راجعت النموذجين وطريقة الحساب.',
       'calc.result': 'النتيجة', 'calc.corrected': 'القيمة المصححة (I + C)', 'calc.correction': 'التصحيح',
-      'calc.indication': 'الإشارة', 'calc.uncertainty': 'عدم اليقين', 'calc.method': 'الطريقة',
+      'calc.indication': 'الإشارة', 'calc.uncertainty': 'عدم اليقين',
       'calc.empty': 'أدخل إشارة: تظهر النتيجة فورًا.',
       'calc.note': 'حساب داخل المجال؛ التفسير المترولوجي يحتاج إلى تأكيد.',
       'calc.history': 'سجل الحسابات', 'calc.historyEmpty': 'لا توجد حسابات بعد.',
@@ -71,7 +71,7 @@
       'rep.foot': 'أداة مساعدة: هذا التقرير لا يُعدّ وحده اعتمادًا أو قرارًا مترولوجيًا رسميًا. يجب أن يراجعه مختص.',
       'footer': 'تُجرى جميع العمليات داخل المتصفح؛ لا تُرسل أي بيانات إلى خادم.',
       'none': '—',
-      'err.minPoints': 'يلزم إدخال نقطتي معايرة على الأقل.',
+      'err.minPoints': 'يلزم 3 نقاط على الأقل.',
       'err.nan': 'النقطة {row}، عمود {col}: قيمة غير رقمية أو فارغة.',
       'err.negU': 'النقطة {row}: عدم اليقين لا يمكن أن يكون سالبًا.',
       'err.dup': 'إشارتان متطابقتان في النقطتين {a} و{b}.',
@@ -94,7 +94,7 @@
       'warn.units': 'وحدتا الإشارة والتصحيح مختلفتان: حساب I + C سيكون محظورًا.',
       'warn.majorant': 'الخط المحافظ يعطي قيمًا سالبة ضمن المجال ولا يمكن استخدامه.',
       'toast.saved': 'تم حفظ الجلسة', 'toast.loaded': 'تم فتح الجلسة', 'toast.imported': 'تم استيراد {n} نقاط',
-      'toast.pasted': 'تم لصق {n} صفوف', 'toast.analyzed': 'اكتمل التحليل', 'toast.csv': 'تم تصدير الملف',
+      'toast.pasted': 'تم لصق {n} صفوف', 'toast.analyzed': 'اكتمل التحليل',
       'confirm.clear': 'مسح كل النقاط؟',
       'btn.importFile': 'استيراد CSV / PDF', 'btn.cancel': 'إلغاء', 'btn.loadSeries': 'تحميل هذه السلسلة',
       'drop2': 'أفلت ملف CSV أو PDF هنا',
@@ -115,16 +115,15 @@
       'confirm.sort': 'الإشارات غير مرتبة تصاعديًا. ترتيب النقاط (مع إبقاء كل صف كاملًا) ثم التحليل؟',
       'err.notSortedUser': 'لم يتم التحليل: النقاط غير مرتبة. رتّبها أو وافق على الترتيب.',
       'err.notSorted': 'النقاط غير مرتبة حسب الإشارة.', 'err.method': 'طريقة حساب غير معروفة.',
-      'err.fitInput': 'يلزم نقطتان حقيقيتان ومنتهيتان على الأقل.',
+      'err.fitInput': 'يلزم ثلاث نقاط حقيقية ومنتهية على الأقل.',
       'f.k': 'معامل التوسيع k', 'k.verify': 'للتحقق', 'f.uncType': 'نوع عدم اليقين',
       'unc.absolute': 'مطلق', 'unc.relative': 'نسبي (% من القراءة)', 'f.validUntil': 'تاريخ انتهاء الصلاحية (اختياري)',
-      'warn.two': 'نقطتان فقط: الخط مضبوط تمامًا والباقي معدوم — النموذج غير ممثِّل.',
       'warn.linearity': 'تنبيه الخطية: أكبر باقٍ للتصحيح يتجاوز أصغر عدم يقين في الشهادة؛ النموذج الخطي لم يعد مهملًا أمام عدم يقين المعايرة.',
       'warn.relative': 'عدم اليقين نسبي: حُوّل إلى قيمة مطلقة U = U% × |I| / 100 قبل الانحدار (القيم الأصلية محفوظة).',
       'warn.kDefault': 'k = 2 قيمة افتراضية غير مأخوذة من الشهادة: تحقّق منها.',
-      'calc.heroNote': 'القيمة المصححة ± U الحذرة (k = {k}) · القيمة المصححة = الإشارة + التصحيح',
-      'calc.uFit': 'U المنمذجة', 'calc.uFitNeg': 'غير قابلة للاستعمال (سالبة)', 'calc.uPrudent': 'U الحذرة',
-      'calc.recommended': 'موصى بها', 'calc.expired': 'انتهت صلاحية الشهادة ({d}): النتيجة للعلم فقط.',
+      'calc.heroNote': 'القيمة المصححة ± U(I) (k = {k}) · القيمة المصححة = الإشارة + التصحيح',
+      'calc.uFit': 'U المنمذجة', 'calc.uPrudent': 'U الحذرة',
+      'calc.expired': 'انتهت صلاحية الشهادة ({d}): النتيجة للعلم فقط.',
       'calc.validRange': 'المجال الصالح', 'calc.resMaxC': 'أكبر باقٍ للاستيفاء', 'calc.exact': 'قيم غير مقرّبة',
       'btn.copy': 'نسخ النتيجة', 'toast.copied': 'تم نسخ النتيجة', 'err.copy': 'تعذّر النسخ',
       'calc.formulas': 'الصيغ المستعملة',
@@ -144,7 +143,7 @@
       'col.fitC': 'C ajustée', 'col.resC': 'Résidu C', 'col.fitU': 'U ajustée', 'col.resU': 'Résidu U',
       'btn.example': 'Exemple', 'btn.import': 'Importer CSV', 'btn.clear': 'Effacer', 'btn.addRow': 'Ajouter un point',
       'btn.analyze': 'Analyser les données', 'btn.saveSession': 'Enregistrer la session', 'btn.loadSession': 'Ouvrir une session',
-      'btn.calculate': 'Calculer', 'btn.exportCsv': 'Exporter CSV', 'btn.print': 'Imprimer / PDF',
+      'btn.calculate': 'Calculer', 'btn.print': 'Imprimer / PDF',
       'btn.goData': 'Aller aux données', 'btn.goAnalysis': 'Voir l’analyse', 'btn.delRow': 'Supprimer le point',
       'meta.title': 'Instrument et certificat',
       'f.instrument': 'Instrument', 'f.certificate': 'N° de certificat', 'f.date': 'Date d’étalonnage', 'f.lab': 'Laboratoire',
@@ -164,9 +163,9 @@
       'verdict.ko': 'Les deux modèles sont non représentatifs selon le critère sur les résidus',
       'verdict.mixed': 'Un seul modèle est acceptable selon le critère sur les résidus',
       'verdict.sub': '{n} points analysés sur l’étendue {lo} → {hi}. Ce contrôle ne constitue pas à lui seul une validation métrologique complète.',
-      'kpi.points': 'Points', 'kpi.range': 'Étendue', 'kpi.thrC': 'Seuil correction', 'kpi.thrU': 'Seuil incertitude',
+      'kpi.points': 'Points', 'kpi.range': 'Étendue',
       'model.correction': 'Interpolation (correction)', 'model.uncertainty': 'Modélisation (incertitude)', 'model.majorant': 'U prudente (majorante)',
-      'st.r2': 'R²', 'st.maxRes': 'Résidu max', 'st.sres': 's_res', 'st.thr': 'Seuil',
+      'st.r2': 'R²', 'st.maxRes': 'Résidu max', 'st.thr': 'Seuil',
       'dec.ok': 'Acceptable', 'dec.ko': 'Non représentatif',
       'r2.low': 'R² faible : remarque informative, sans règle universelle de rejet.', 'r2.undef': 'R² non défini : données constantes.',
       'r2.ok': 'Le R² est un indicateur descriptif uniquement.',
@@ -175,12 +174,12 @@
       'chart.residuals': 'Résidus', 'chart.residual': 'Résidu', 'chart.threshold': '± seuil',
       'an.disclaimer': 'Les seuils sont des réglages initiaux, non une règle normative générale. L’interprétation métrologique finale relève du spécialiste.',
       'calc.h': 'Calculateur', 'calc.p': 'Calculez la valeur corrigée et l’incertitude pour une indication dans l’étendue uniquement.',
-      'calc.form': 'Entrées', 'f.inputI': 'Indication lue', 'f.methodC': 'Méthode de correction', 'f.methodU': 'Modèle d’incertitude',
-      'method.regression': 'Régression linéaire', 'method.interpolation': 'Interpolation linéaire',
+      'calc.form': 'Entrées', 'f.inputI': 'Indication lue', 'f.methodU': 'Modèle d’incertitude',
+      'method.regression': 'Régression linéaire',
       'method.majorant': 'Droite majorante', 'method.fitted': 'Droite ajustée',
       'calc.confirm': 'Je confirme avoir vérifié les modèles et la méthode de calcul.',
       'calc.result': 'Résultat', 'calc.corrected': 'Valeur corrigée (I + C)', 'calc.correction': 'Correction',
-      'calc.indication': 'Indication', 'calc.uncertainty': 'Incertitude', 'calc.method': 'Méthode',
+      'calc.indication': 'Indication', 'calc.uncertainty': 'Incertitude',
       'calc.empty': 'Saisissez une indication : le résultat s’affiche instantanément.',
       'calc.note': 'Calcul dans l’étendue ; interprétation métrologique à confirmer.',
       'calc.history': 'Historique', 'calc.historyEmpty': 'Aucun calcul pour l’instant.',
@@ -194,7 +193,7 @@
       'rep.foot': 'Outil d’aide : ce rapport ne constitue pas à lui seul une validation ou une décision métrologique officielle. Il doit être revu par un spécialiste.',
       'footer': 'Tous les calculs sont effectués dans le navigateur ; aucune donnée n’est envoyée à un serveur.',
       'none': '—',
-      'err.minPoints': 'Au moins deux points sont requis.',
+      'err.minPoints': 'Minimum 3 points requis.',
       'err.nan': 'Point {row}, colonne {col} : valeur vide ou non numérique.',
       'err.negU': 'Point {row} : incertitude négative interdite.',
       'err.dup': 'Deux indications identiques aux points {a} et {b}.',
@@ -217,7 +216,7 @@
       'warn.units': 'Unités indication/correction différentes : le calcul I + C sera bloqué.',
       'warn.majorant': 'La droite majorante donne des valeurs négatives dans l’étendue : inutilisable.',
       'toast.saved': 'Session enregistrée', 'toast.loaded': 'Session ouverte', 'toast.imported': '{n} points importés',
-      'toast.pasted': '{n} lignes collées', 'toast.analyzed': 'Analyse terminée', 'toast.csv': 'Fichier exporté',
+      'toast.pasted': '{n} lignes collées', 'toast.analyzed': 'Analyse terminée',
       'confirm.clear': 'Effacer tous les points ?',
       'btn.importFile': 'Importer CSV / PDF', 'btn.cancel': 'Annuler', 'btn.loadSeries': 'Charger cette série',
       'drop2': 'Déposez un fichier CSV ou PDF ici',
@@ -238,16 +237,15 @@
       'confirm.sort': 'Les indications ne sont pas croissantes. Trier les points (lignes entières conservées) puis analyser ?',
       'err.notSortedUser': 'Analyse non lancée : points non triés. Triez-les ou acceptez le tri.',
       'err.notSorted': 'Points non triés selon l’indication.', 'err.method': 'Méthode de calcul non reconnue.',
-      'err.fitInput': 'Il faut au moins deux paires réelles et finies.',
+      'err.fitInput': 'Il faut au moins trois paires réelles et finies.',
       'f.k': 'Facteur d’élargissement k', 'k.verify': 'à vérifier', 'f.uncType': 'Type d’incertitude',
       'unc.absolute': 'Absolue', 'unc.relative': 'Relative (% de la lecture)', 'f.validUntil': 'Date de validité (facultative)',
-      'warn.two': 'Deux points seulement : droite exacte, résidu nul — modèle non représentatif.',
       'warn.linearity': 'Alerte de linéarité : le résidu max de la correction dépasse la plus petite incertitude du certificat ; le modèle linéaire n’est plus négligeable devant l’incertitude d’étalonnage.',
       'warn.relative': 'Incertitude relative : convertie en absolue U = U% × |I| / 100 avant régression (valeurs d’origine conservées).',
       'warn.kDefault': 'k = 2 est une valeur par défaut, non lue sur le certificat : à vérifier.',
-      'calc.heroNote': 'Valeur corrigée ± U prudente (k = {k}) · valeur corrigée = indication + correction',
-      'calc.uFit': 'U modélisée', 'calc.uFitNeg': 'Non exploitable (négative)', 'calc.uPrudent': 'U prudente',
-      'calc.recommended': 'recommandée', 'calc.expired': 'Certificat expiré ({d}) : résultat à titre indicatif uniquement.',
+      'calc.heroNote': 'Valeur corrigée ± U(I) (k = {k}) · valeur corrigée = indication + correction',
+      'calc.uFit': 'U modélisée', 'calc.uPrudent': 'U prudente',
+      'calc.expired': 'Certificat expiré ({d}) : résultat à titre indicatif uniquement.',
       'calc.validRange': 'Étendue valide', 'calc.resMaxC': 'Résidu max interpolation', 'calc.exact': 'Valeurs non arrondies',
       'btn.copy': 'Copier le résultat', 'toast.copied': 'Résultat copié', 'err.copy': 'Copie impossible',
       'calc.formulas': 'Formules utilisées',
@@ -310,13 +308,15 @@
 
   /* Affichage : 10 chiffres significatifs par défaut (le calcul interne reste en double).
    * Les petites valeurs restent en notation scientifique : jamais de faux zéro. */
+  // Même écriture que l'application (util/format.dart fmtNum) : pas de séparateur de milliers.
   function fmt(v, digits = 10) {
     if (!Number.isFinite(v)) return '—';
     if (v === 0) return '0';
-    const locale = state.lang === 'fr' ? 'fr-FR' : 'en-US';
     const abs = Math.abs(v);
-    if (abs >= 1e9 || abs < 1e-5) return v.toExponential(Math.max(2, Math.min(digits, 10) - 1)).replace(/\.?0+e/, 'e');
-    return new Intl.NumberFormat(locale, { maximumSignificantDigits: digits, useGrouping: abs >= 1e4 }).format(v);
+    const s = abs >= 1e9 || abs < 1e-5
+      ? v.toExponential(Math.max(2, Math.min(digits, 10) - 1)).replace(/\.?0+e/, 'e')
+      : String(Number(v.toPrecision(digits)));
+    return state.lang === 'fr' ? s.replace('.', ',') : s;
   }
   const signed = v => (v < 0 ? '− ' + fmt(-v) : '+ ' + fmt(v));
   const Core = window.EtalonnageCore;
@@ -465,9 +465,10 @@
   const rawStr = v => (state.lang === 'fr' ? String(v).replace('.', ',') : String(v));
 
   /* calculerResultat */
-  function calculer(xRaw, methodC, confirmed) {
+  function calculer(xRaw, confirmed) {
     try {
-      return { ...Core.calculer(state.analysis, state.analysis.meta, xRaw, methodC, confirmed), time: new Date() };
+      // Toujours la régression linéaire (pas de choix de méthode).
+      return { ...Core.calculer(state.analysis, state.analysis.meta, xRaw, 'regression', confirmed), time: new Date() };
     } catch (err) {
       throw new Error(err.code ? coreMessage(err.code, err.params) : err.message);
     }
@@ -615,18 +616,16 @@
     $('kpis').innerHTML = [
       ['kpi.points', A.pts.length, ''],
       ['kpi.range', `${fmt(A.lo)} → ${fmt(A.hi)}`, A.meta.unitI],
-      ['kpi.thrC', fmt(A.sC), A.meta.unitC],
-      ['kpi.thrU', fmt(A.sU), A.meta.unitU],
     ].map(([k, v, u]) => `<div class="kpi"><div class="k-label">${t(k)}</div><div class="k-value">${v}${unit(u)}</div></div>`).join('');
     $('analysisAlerts').innerHTML = alertsHtml(state.warnings.map(w => t(w)), 'warn');
 
     $('decC').innerHTML = pill(okC); $('decU').innerHTML = pill(okU);
     $('eqC').innerHTML = eq('C', A.c);
     $('eqU').innerHTML = `${eq('U', A.u)}<span class="pill ${A.maj.usable ? 'neutral' : 'warn'}" title="${t('model.majorant')}">${t('chart.majorant')}: <bdi dir="ltr" class="eq">${fmt(A.maj.a)} · I ${signed(A.maj.b)}</bdi></span>`;
-    const stats = (m, thr) => [
-      ['st.r2', fmt(m.R2, 5)], ['st.maxRes', fmt(m.residuMax)], ['st.sres', fmt(m.sRes)], ['st.thr', fmt(thr)],
+    const stats = m => [
+      ['st.r2', fmt(m.R2, 6)], ['st.maxRes', fmt(m.residuMax)],
     ].map(([k, v]) => `<div><dt>${t(k)}</dt><dd>${v}</dd></div>`).join('');
-    $('statsC').innerHTML = stats(A.c, A.sC); $('statsU').innerHTML = stats(A.u, A.sU);
+    $('statsC').innerHTML = stats(A.c); $('statsU').innerHTML = stats(A.u);
     $('noteC').innerHTML = `${icon('info', 14)}<span>${t(A.decC.r2)}</span>`;
     $('noteU').innerHTML = `${icon('info', 14)}<span>${t(A.decU.r2)} ${t('maj.note', { r: fmt(A.u.residuMax) })}</span>`;
     drawAnalysisCharts();
@@ -648,21 +647,21 @@
     $('c-lo').textContent = 'min ' + fmt(A.lo); $('c-hi').textContent = 'max ' + fmt(A.hi);
     liveCalc(); renderHistory();
   }
-  /* Affichage métrologique : U à 2 chiffres significatifs arrondie vers le haut ; C et I + C avec
-   * le même nombre de décimales que U prudente. Les valeurs non arrondies restent visibles. */
+  /* Affichage métrologique (mêmes règles que l'application, util/format.dart) : U(I) à 2 chiffres
+   * significatifs arrondie vers le haut ; C et I + C avec le même nombre de décimales que U(I). */
   function fixed(v, decimals) {
-    const r = Number(v.toFixed(decimals));
-    const locale = state.lang === 'fr' ? 'fr-FR' : 'en-US';
-    return new Intl.NumberFormat(locale, { minimumFractionDigits: decimals, maximumFractionDigits: decimals, useGrouping: false })
-      .format(r === 0 ? 0 : r);
+    let s = v.toFixed(decimals);
+    if (Number(s) === 0) s = (0).toFixed(decimals); // jamais « -0,000 »
+    return state.lang === 'fr' ? s.replace('.', ',') : s;
   }
   function displayResult(R) {
-    const ru = Core.arrondirIncertitude(R.uPrudent);
-    const rf = R.uFitOk ? Core.arrondirIncertitude(R.uFit) : null;
+    const ru = Core.arrondirIncertitude(R.uFit);
+    const rp = Core.arrondirIncertitude(R.uPrudent); // tableau du rapport uniquement
     const dec = ru.decimals;
+    const c = fixed(R.C, dec);
     return {
-      C: (R.C > 0 ? '+' : '') + fixed(R.C, dec), corrected: fixed(R.corrected, dec),
-      uPrudent: fixed(ru.value, ru.decimals), uFit: rf ? fixed(rf.value, rf.decimals) : null,
+      C: (Number(c.replace(',', '.')) > 0 ? '+' : '') + c, corrected: fixed(R.corrected, dec),
+      u: fixed(ru.value, ru.decimals), uPrudent: fixed(rp.value, rp.decimals),
     };
   }
   const isExpired = m => !!m.validUntil && m.validUntil < new Date().toISOString().slice(0, 10);
@@ -679,22 +678,20 @@
     el.innerHTML = `${expired}
       <div class="result-hero">
         <div class="r-label">${t('calc.corrected')}</div>
-        <div class="r-value">${D.corrected} <small>± ${D.uPrudent} ${esc(uI)}</small></div>
+        <div class="r-value">${D.corrected} <small>± ${D.u} ${esc(uI)}</small></div>
         <div class="help" style="margin-top:4px">${t('calc.heroNote', { k })}</div>
       </div>
       <div class="r-grid r-grid-2">
         <div class="kpi"><div class="k-label">${t('calc.correction')} C(I)</div><div class="k-value">${D.C}${unit(m.unitC || uI)}</div></div>
         <div class="kpi"><div class="k-label">${t('calc.corrected')}</div><div class="k-value">${D.corrected}${unit(uI)}</div></div>
         <div class="kpi"><div class="k-label">${t('calc.uFit')} (k = ${esc(m.k || '—')})</div>
-          <div class="k-value">${D.uFit ?? `<span style="color:var(--err);font-size:13px">${t('calc.uFitNeg')}</span>`}${D.uFit ? unit(uU) : ''}</div></div>
-        <div class="kpi kpi-reco"><div class="k-label">${t('calc.uPrudent')} <span class="pill ok">${t('calc.recommended')}</span></div>
-          <div class="k-value">${D.uPrudent}${unit(uU)}</div></div>
+          <div class="k-value">${D.u}${unit(uU)}</div></div>
       </div>
       <dl class="stats" style="margin-top:12px">
         <div><dt>${t('f.certificate')}</dt><dd>${esc(m.certificate || '—')}</dd></div>
         <div><dt>${t('calc.validRange')}</dt><dd>${fmt(A.lo)} → ${fmt(A.hi)}</dd></div>
         <div><dt>${t('calc.resMaxC')}</dt><dd>${fmt(A.c.residuMax)}</dd></div>
-        <div><dt>${t('calc.exact')}</dt><dd title="C = ${fmt(R.C)} ; U = ${fmt(R.uPrudent)}">C ${fmt(R.C, 6)} · Up ${fmt(R.uPrudent, 6)}</dd></div>
+        <div><dt>${t('calc.exact')}</dt><dd title="C = ${fmt(R.C)} ; U = ${fmt(R.uFit)}">C ${fmt(R.C, 6)} · U ${fmt(R.uFit, 6)}</dd></div>
       </dl>
       <div class="toolbar" style="margin-top:12px">
         <button class="btn" type="button" id="copyResultBtn">${icon('doc')}<span>${t('btn.copy')}</span></button>
@@ -702,10 +699,9 @@
       <details class="formulas">
         <summary>${t('calc.formulas')}</summary>
         <ul dir="ltr">
-          <li>C(I) = a<sub>C</sub> · I + b<sub>C</sub> = ${fmt(A.c.a)} · I ${signed(A.c.b)}${R.methodC === 'interpolation' ? ` <i>(${t('method.interpolation')})</i>` : ''}</li>
+          <li>C(I) = a<sub>C</sub> · I + b<sub>C</sub> = ${fmt(A.c.a)} · I ${signed(A.c.b)}</li>
           <li>I<sub>corr</sub> = I + C(I)</li>
           <li>U(I) = a<sub>U</sub> · I + b<sub>U</sub> = ${fmt(A.u.a)} · I ${signed(A.u.b)}</li>
-          <li>U<sub>p</sub>(I) = U(I) + max|e<sub>U</sub>| = U(I) + ${fmt(A.u.residuMax)}</li>
           <li>e<sub>i</sub> = y<sub>i</sub> − (a · x<sub>i</sub> + b)</li>
         </ul>
         <p class="help">${t('calc.formulasNote')}</p>
@@ -722,20 +718,19 @@
       `${t('calc.indication')} : ${fmt(R.x)} ${uI}`,
       `${t('calc.correction')} C(I) : ${D.C} ${m.unitC || uI}`,
       `${t('calc.corrected')} : ${D.corrected} ${uI}`,
-      `${t('calc.uPrudent')} : ${D.uPrudent} ${uU} (k = ${m.k || '—'}${state.kVerified ? '' : ', ' + t('k.verify')})`,
-      `${t('calc.uFit')} : ${D.uFit ?? t('calc.uFitNeg')} ${D.uFit ? uU : ''}`,
+      `${t('calc.uFit')} : ${D.u} ${uU} (k = ${m.k || '—'}${state.kVerified ? '' : ', ' + t('k.verify')})`,
       `${t('f.certificate')} : ${m.certificate || '—'} · ${t('calc.validRange')} : ${fmt(state.analysis.lo)} → ${fmt(state.analysis.hi)}`,
     ].join('\n');
     navigator.clipboard?.writeText(txt).then(() => toast(t('toast.copied')), () => toast(t('err.copy')));
   }
   function historyTable(rows, compact = false) {
     if (!rows.length) return `<tbody><tr><td class="help" style="text-align:center;padding:18px">${t('calc.historyEmpty')}</td></tr></tbody>`;
-    return `<thead><tr><th>#</th><th>${t('calc.indication')}</th><th>${t('calc.correction')}</th><th>${t('calc.corrected')}</th><th>${t('calc.uPrudent')}</th>${compact ? '' : `<th>${t('calc.method')}</th>`}</tr></thead><tbody>` +
+    // compact = tableau du rapport (inchangé : U prudente) ; sinon historique du calculateur (U(I)).
+    return `<thead><tr><th>#</th><th>${t('calc.indication')}</th><th>${t('calc.correction')}</th><th>${t('calc.corrected')}</th><th>${t(compact ? 'calc.uPrudent' : 'calc.uFit')}</th></tr></thead><tbody>` +
       rows.map((r, i) => {
         const D = displayResult(r);
         return `<tr><td class="num-cell">${i + 1}</td><td class="num-cell">${fmt(r.x)}</td><td class="num-cell">${D.C}</td>
-        <td class="num-cell"><b>${D.corrected}</b></td><td class="num-cell">${D.uPrudent} (${esc(r.nature)}, k = ${esc(r.k || '—')})</td>
-        ${compact ? '' : `<td style="font-size:12px;color:var(--text-3)">${t('method.' + r.methodC)}</td>`}</tr>`;
+        <td class="num-cell"><b>${D.corrected}</b></td><td class="num-cell">${compact ? D.uPrudent : D.u} (${esc(r.nature)}, k = ${esc(r.k || '—')})</td></tr>`;
       }).join('') +
       '</tbody>';
   }
@@ -858,7 +853,7 @@
     if (!state.analysis) return;
     $('calcAlerts').innerHTML = '';
     try {
-      state.lastResult = calculer($('c-input').value, $('c-methodC').value, $('c-confirm').checked);
+      state.lastResult = calculer($('c-input').value, $('c-confirm').checked);
     } catch (err) {
       state.lastResult = null;
       $('calcAlerts').innerHTML = alertsHtml([err.message], 'err');
@@ -1111,27 +1106,6 @@
   }
   function persist() { storage.set({ ...snapshot(), lang: state.lang, theme: state.theme }); }
 
-  function exportCsv() {
-    const A = state.analysis;
-    if (!A) return;
-    const d = v => (Number.isFinite(v) ? String(+v.toPrecision(12)).replace('.', ',') : '');
-    const lines = [
-      ['Indication', 'Correction', 'Incertitude', 'C_ajustee', 'Residu_C', 'U_ajustee', 'Residu_U', 'U_majorante'].join(';'),
-      ...A.pts.map((p, i) => [p.x, p.c, p.u, A.c.ajuste[i], A.c.residu[i], A.u.ajuste[i], A.u.residu[i], A.maj.a * p.x + A.maj.b].map(d).join(';')),
-      '',
-      ['Modele', 'a', 'b', 'R2', 'Residu_max', 's_res', 'Seuil', 'Decision'].join(';'),
-      ['Correction', d(A.c.a), d(A.c.b), d(A.c.R2), d(A.c.residuMax), d(A.c.sRes), d(A.sC), A.decC.ok ? 'Acceptable' : 'Non representatif'].join(';'),
-      ['Incertitude', d(A.u.a), d(A.u.b), d(A.u.R2), d(A.u.residuMax), d(A.u.sRes), d(A.sU), A.decU.ok ? 'Acceptable' : 'Non representatif'].join(';'),
-      ['U_prudente (majorante)', d(A.maj.a), d(A.maj.b), '', '', '', '', A.maj.usable ? 'Utilisable' : 'Non utilisable'].join(';'),
-    ];
-    if (state.history.length) {
-      lines.push('', ['Calcul_indication', 'Correction', 'Valeur_corrigee', 'U_modelisee', 'U_prudente', 'k', 'Nature', 'Methode_C'].join(';'));
-      state.history.forEach(r => lines.push([d(r.x), d(r.C), d(r.corrected), r.uFitOk ? d(r.uFit) : 'non exploitable', d(r.uPrudent), r.k, r.nature, r.methodC].join(';')));
-    }
-    download(`${slug()}_analyse.csv`, '﻿' + lines.join('\r\n'), 'text/csv;charset=utf-8');
-    toast(t('toast.csv'));
-  }
-
   function toast(msg) {
     const el = document.createElement('div');
     el.className = 'toast'; el.innerHTML = `${icon('check')}<span>${esc(msg)}</span>`;
@@ -1176,7 +1150,6 @@
   $('c-input').addEventListener('keydown', e => { if (e.key === 'Enter') runCalc(); });
   $('clearHistoryBtn').addEventListener('click', () => { state.history = []; renderHistory(); });
   $('c-input').addEventListener('input', liveCalc);
-  $('c-methodC').addEventListener('change', liveCalc);
   $('c-confirm').addEventListener('change', liveCalc);
   $('m-k').addEventListener('input', () => { state.kVerified = $('m-k').value.trim() !== ''; updateKPill(); });
   $('importBtn').addEventListener('click', () => $('csvFile').click());
@@ -1195,7 +1168,6 @@
       restore(s); changed(); toast(t('toast.loaded'));
     });
   });
-  $('csvBtn').addEventListener('click', exportCsv);
   $('xlsxBtn').addEventListener('click', () => {
     const A = state.analysis;
     if (!A) return;

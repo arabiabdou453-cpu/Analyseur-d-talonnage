@@ -24,8 +24,7 @@
   /* ajusterDroite : OLS centrée y = a·x + b (pas d'inversion de matrice). */
   function ajusterDroite(x, y) {
     const n = x.length;
-    // n = 2 accepté (droite exacte, résidu nul, non représentatif : averti par valider) ; n < 2 impossible.
-    if (n < 2 || n !== y.length || ![...x, ...y].every(Number.isFinite)) throw new CoreError('fitInput');
+    if (n < 3 || n !== y.length || ![...x, ...y].every(Number.isFinite)) throw new CoreError('fitInput');
     const xc = x.reduce((s, v) => s + v, 0) / n, yc = y.reduce((s, v) => s + v, 0) / n;
     const dx = x.map(v => v - xc), dy = y.map(v => v - yc);
     const Sxx = dx.reduce((s, v) => s + v * v, 0);
@@ -37,8 +36,7 @@
     const constant = SST <= TOL * Math.max(1, y.reduce((s, v) => s + v * v, 0));
     return {
       a, b, x: x.slice(), mesure: y.slice(), ajuste, residu, residuMax: Math.max(...residu.map(Math.abs)),
-      // s_res = √(SSE/(n−2)) : non défini pour n = 2 (aucun degré de liberté).
-      SSE, SST, R2: constant ? NaN : 1 - SSE / SST, sRes: n > 2 ? Math.sqrt(SSE / (n - 2)) : NaN, n, constant,
+      SSE, SST, R2: constant ? NaN : 1 - SSE / SST, sRes: Math.sqrt(SSE / (n - 2)), n, constant,
     };
   }
 
@@ -65,7 +63,7 @@
       const u = relative ? v[2] * Math.abs(v[0]) / 100 : v[2];
       return { x: v[0], c: v[1], u, uRaw: v[2] };
     });
-    if (pts.length < 2) errors.unshift({ code: 'minPoints', params: {} });
+    if (pts.length < 3) errors.unshift({ code: 'minPoints', params: {} });
     if (!errors.length) {
       for (let i = 0; i < pts.length; i++) {
         const j = pts.findIndex((p, k) => k > i && p.x === pts[i].x);
@@ -89,7 +87,6 @@
     }
     if (!errors.length) {
       if (pts.some(p => p.u === 0)) warnings.push('warn.zeroU');
-      if (pts.length === 2) warnings.push('warn.two');
       if (pts.length === 3) warnings.push('warn.three');
       if (meta.unitI && meta.unitC && meta.unitI.trim() !== meta.unitC.trim()) warnings.push('warn.units');
     }
@@ -124,10 +121,10 @@
   /* calculerResultat : même ordre de contrôles que la version MATLAB.
    *   Correction  C(I)  = a_C · I + b_C            (ou interpolation point par point, au choix explicite)
    *   Valeur corrigée   = I + C(I)
-   *   U modélisée U(I)  = a_U · I + b_U
-   *   U prudente  Up(I) = U(I) + résidu max de la modélisation  (recommandée ; = droite majorante)
-   * Sécurité : hors étendue, U prudente négative, nature inconnue ou unités incompatibles → bloqué.
-   * Une U modélisée négative n'est jamais remplacée par 0 : elle est signalée « non exploitable ». */
+   *   Incertitude U(I)  = a_U · I + b_U            (valeur affichée)
+   *   U prudente  Up(I) = U(I) + résidu max  (conservée pour le rapport uniquement)
+   * Sécurité : hors étendue, U(I) négative (au point ou à une borne), nature inconnue ou unités
+   * incompatibles → bloqué. Une incertitude négative n'est jamais remplacée par 0. */
   function calculer(A, meta, xRaw, methodC, confirmed) {
     if (!confirmed) throw new CoreError('confirm');
     const x = typeof xRaw === 'number' ? xRaw : parseNum(xRaw);
@@ -138,13 +135,12 @@
     else if (methodC === 'interpolation') C = interpolation(x, A.pts);
     else throw new CoreError('method');
     if (!A.maj.usable) throw new CoreError('majorant');
-    const uPrudent = A.maj.a * x + A.maj.b;
-    if (!Number.isFinite(uPrudent) || uPrudent < 0) throw new CoreError('negModel');
     const uFit = A.u.a * x + A.u.b;
-    const uFitOk = Number.isFinite(uFit) && uFit >= 0 && [A.lo, A.hi].every(v => A.u.a * v + A.u.b >= 0);
+    if (!Number.isFinite(uFit) || uFit < 0 || [A.lo, A.hi].some(v => A.u.a * v + A.u.b < 0)) throw new CoreError('negModel');
+    const uPrudent = A.maj.a * x + A.maj.b;
     if (!meta.nature) throw new CoreError('nature');
     if (meta.unitI && meta.unitI.trim() !== (meta.unitC || '').trim()) throw new CoreError('unitsCalc');
-    return { x, C, corrected: x + C, uFit, uFitOk, uPrudent, U: uPrudent, methodC, nature: meta.nature, k: meta.k || '' };
+    return { x, C, corrected: x + C, uFit, uPrudent, U: uFit, methodC, nature: meta.nature, k: meta.k || '' };
   }
 
   /* Alerte de linéarité : le résidu max de la correction dépasse la plus petite incertitude
