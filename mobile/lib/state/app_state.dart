@@ -3,6 +3,7 @@
 library;
 
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -10,6 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../core/certificate.dart';
 import '../core/data_io.dart';
 import '../core/engine.dart';
+import '../core/referentiel.dart';
 import '../l10n/strings.dart';
 import '../util/format.dart';
 
@@ -146,23 +148,38 @@ class AppState extends ChangeNotifier {
 
   void clearRows() => setRows(const []);
 
+  /// Exemples ([exemples]) en cycle mélangé : jamais deux fois le même de suite.
+  final List<int> _exampleQueue = [];
+  int _lastExample = -1;
+  final math.Random _rng = math.Random();
+
   void loadExample() {
-    String n(String s) => lang == 'fr' ? s : s.replaceAll(',', '.');
-    _setRows([
-      [n('0'), n('0,1'), n('0,2')],
-      [n('10'), n('0,2'), n('0,22')],
-      [n('20'), n('0,3'), n('0,24')],
-      [n('30'), n('0,4'), n('0,26')],
-    ]);
-    metaCtl['instrument']!.text = lang == 'fr' ? 'Thermomètre numérique' : 'ميزان حرارة رقمي';
-    metaCtl['certificate']!.text = 'EX-0001';
-    for (final k in ['unitI', 'unitC', 'unitU']) {
-      metaCtl[k]!.text = '°C';
+    if (_exampleQueue.isEmpty) {
+      _exampleQueue.addAll(List.generate(exemples.length, (i) => i)..shuffle(_rng));
+      if (_exampleQueue.first == _lastExample) _exampleQueue.add(_exampleQueue.removeAt(0));
     }
+    _lastExample = _exampleQueue.removeAt(0);
+    final ex = exemples[_lastExample];
+    _setRows([for (final p in ex.points) [for (final v in p) rawNum(v, lang)]]);
+    metaCtl['instrument']!.text = lang == 'fr' ? ex.instrument : ex.instrumentAr;
+    metaCtl['certificate']!.text = ex.certificat;
+    _setUnitText(ex.unite);
     metaCtl['k']!.text = '2';
     kVerified = true; // jeu d'exemple : k = 2 fait partie des données
     uncType = UncType.absolute;
     nature = 'U';
+    _changed();
+  }
+
+  /// Unité choisie (Grandeur puis Unité) : s'applique à l'indication, à la correction et à l'incertitude.
+  void _setUnitText(String u) {
+    for (final k in ['unitI', 'unitC', 'unitU']) {
+      metaCtl[k]!.text = u;
+    }
+  }
+
+  void setUnit(String u) {
+    _setUnitText(u);
     _changed();
   }
 
@@ -178,9 +195,7 @@ class AppState extends ChangeNotifier {
     set('certificate', m.certificate);
     set('date', m.date);
     set('lab', m.lab);
-    for (final k in ['unitI', 'unitC', 'unitU']) {
-      set(k, s.unit);
-    }
+    if (s.unit.isNotEmpty) _setUnitText(trouverUnite(s.unit).unite);
     // k seulement s'il est imprimé sur chaque ligne ; nature U seulement si
     // le certificat parle explicitement d'incertitude élargie. Jamais supposés.
     metaCtl['k']!.text = s.k.isFinite ? rawNum(s.k, lang) : '2';

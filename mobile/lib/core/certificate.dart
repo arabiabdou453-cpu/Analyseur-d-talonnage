@@ -8,6 +8,7 @@
 library;
 
 import 'engine.dart';
+import 'referentiel.dart';
 
 class CertPoint {
   const CertPoint(this.line, this.u, this.k);
@@ -26,6 +27,9 @@ class CertSeries {
   CertSeries(this.title, this.quantity, this.unit);
   final String title, quantity, unit;
   final List<CertPoint> points = [];
+
+  /// Famille (référentiel), renseignée à l'extraction.
+  String famille = familleAutre;
 
   bool get inconsistent => points.any((p) => !p.ok);
 
@@ -54,8 +58,11 @@ class CertMeta {
 }
 
 class Certificate {
-  const Certificate(this.series, this.meta, {required this.hasText});
+  const Certificate(this.series, this.meta, {required this.hasText, this.famille = familleAutre});
   final List<CertSeries> series;
+
+  /// Famille détectée sur l'ensemble du document.
+  final String famille;
   final CertMeta meta;
   final bool hasText;
 }
@@ -100,6 +107,9 @@ Certificate analyserCertificat(List<String> lignes) {
     courant.points.add(CertPoint(ligneCertificat(nums), u, k));
   }
   final texte = lignes.join('\n');
+  for (final s in series) {
+    s.famille = classerFamille(s.title, texte);
+  }
   String valeur(String motif) {
     final m = RegExp(motif, caseSensitive: false).firstMatch(texte);
     return m == null ? '' : m[1]!.replaceAll(RegExp(r'\s{2,}'), ' ').trim();
@@ -126,5 +136,39 @@ Certificate analyserCertificat(List<String> lignes) {
       expanded: RegExp(r'incerti\w*\s+[ée]largie|expanded\s+uncertainty', caseSensitive: false).hasMatch(texte),
     ),
     hasText: texte.replaceAll(RegExp(r'\s'), '').length > 20,
+    famille: classerFamille('', texte),
   );
+}
+
+/// Famille d'une série : un nom de [famillesExclues], ou [familleAutre].
+/// Mots-clés de la série, puis du document ; le contexte « pesage » d'un document
+/// ne fait jamais exclure ses séries pour les poids étalons utilisés comme référence.
+final List<RegExp> _motsFamille = [
+  RegExp(r'\bdimensionnel|\blongueur\b|\bcales?\s+etalons?|pieds?\s+a\s+coulisse|micrometre|comparateur'),
+  RegExp(r'poids\s+etalons?|masses?\s+etalons?|masse\s+conventionnelle|\bclasse\s+(e1|e2|f1|f2|m1|m2|m3)\b'),
+  RegExp(r'verrerie|instruments?\s+de\s+volume|pipette|burette|\bfioles?\b|eprouvette'),
+];
+
+String _sansAccents(String s) {
+  const de = 'àâäáéèêëîïíôöóùûüúçÀÂÄÁÉÈÊËÎÏÍÔÖÓÙÛÜÚÇ', vers = 'aaaaeeeeiiiooouuuucAAAAEEEEIIIOOOUUUUC';
+  final b = StringBuffer();
+  for (final ch in s.split('')) {
+    final i = de.indexOf(ch);
+    b.write(i < 0 ? ch : vers[i]);
+  }
+  return b.toString().toLowerCase();
+}
+
+String classerFamille(String texteSerie, [String texteDocument = '']) {
+  String? chercher(String txt, int sauf) {
+    for (var i = 0; i < _motsFamille.length; i++) {
+      if (i != sauf && _motsFamille[i].hasMatch(txt)) return famillesExclues[i];
+    }
+    return null;
+  }
+
+  final doc = _sansAccents(texteDocument);
+  return chercher(_sansAccents(texteSerie), -1) ??
+      chercher(doc, RegExp('balance|pesage|ipfna').hasMatch(doc) ? 1 : -1) ??
+      familleAutre;
 }

@@ -177,8 +177,26 @@
     return { ref: a, eq: b, err: b - a, ok: false, recalcule: true };
   }
 
+  /* Famille d'une série de certificat : un nom de EtalonnageRef.FAMILLES_EXCLUES, ou 'Autre'.
+     Grandeur du titre d'abord, puis mots-clés (série, puis document). Le contexte « pesage »
+     d'un document ne fait jamais exclure ses séries pour les poids étalons utilisés comme référence. */
+  const MOTS_FAMILLE = [
+    /\bdimensionnel|\blongueur\b|\bcales?\s+etalons?|pieds?\s+a\s+coulisse|micrometre|comparateur/,
+    /poids\s+etalons?|masses?\s+etalons?|masse\s+conventionnelle|\bclasse\s+(e1|e2|f1|f2|m1|m2|m3)\b/,
+    /verrerie|instruments?\s+de\s+volume|pipette|burette|\bfioles?\b|eprouvette/,
+  ];
+  const sansAccents = s => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+  function classerFamille(texteSerie, texteDocument = '') {
+    const noms = root.EtalonnageRef.FAMILLES_EXCLUES;
+    const chercher = (txt, sauf) => { const i = MOTS_FAMILLE.findIndex((re, j) => j !== sauf && re.test(txt)); return i < 0 ? null : noms[i]; };
+    const doc = sansAccents(texteDocument);
+    return chercher(sansAccents(texteSerie), -1)
+      || chercher(doc, /balance|pesage|ipfna/.test(doc) ? 1 : -1)
+      || 'Autre';
+  }
+
   root.EtalonnageCore = Object.freeze({
     TOL, CoreError, parseNum, ajusterDroite, evaluerCritere, valider, analyser, interpolation, calculer, ligneCertificat,
-    alerteLinearite, arrondirIncertitude,
+    alerteLinearite, arrondirIncertitude, classerFamille,
   });
 })(typeof window !== 'undefined' ? window : globalThis);

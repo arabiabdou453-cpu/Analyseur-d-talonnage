@@ -27,9 +27,12 @@ void main() {
     expect(find.text('Analyseur d’étalonnage'), findsOneWidget);
     expect(find.text('Données'), findsWidgets);
 
-    await tester.tap(find.text('Exemple'));
+    await tester.tap(find.text('Exemple')); // exemple tiré au hasard : 5 à 8 points
     await tester.pumpAndSettle();
-    expect(s.filledRows.length, 4);
+    expect(s.filledRows.length, inInclusiveRange(5, 8));
+    s.setRows([['0', '0,1', '0,2'], ['10', '0,2', '0,22'], ['20', '0,3', '0,24'], ['30', '0,4', '0,26']]);
+    s.setUnit('°C');
+    await tester.pumpAndSettle();
 
     await tester.tap(find.text('Analyser les données'));
     await tester.pumpAndSettle();
@@ -67,7 +70,7 @@ void main() {
     await tester.tap(find.text('Analyser les données'));
     await tester.pumpAndSettle();
     expect(s.analysis, isNotNull);
-    s.rows[0][1].text = '0,5';
+    s.rows[0][1].text = '9,87'; // valeur absente de tous les exemples
     await tester.pumpAndSettle();
     expect(s.analysis, isNull);
     expect(s.stale, isTrue);

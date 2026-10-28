@@ -15,6 +15,7 @@
   <h1>Tests du moteur web (références : tests/TestRegression.m)</h1>
   <div id="summary">…</div>
   <ul id="out"></ul>
+  <script src="referentiel.js"></script>
   <script src="core.js"></script>
   <script src="xlsx.js"></script>
   <script>
@@ -119,6 +120,13 @@
       near('U ajustée: a', A.u.a, .05); near('U ajustée: b', A.u.b, -1 / 6);
       throwsCode('U(I) négative à une borne : calcul bloqué (jamais remplacée par 0)', () => K.calculer(A, meta, 15, 'regression', true), 'negModel');
       log(A.maj.usable, 'Majorante utilisable (>= U >= 0 aux bornes)');
+    }
+    // Classification des familles exclues
+    {
+      const F = window.EtalonnageRef.FAMILLES_EXCLUES, c = K.classerFamille;
+      const got = [c('Cale étalon 25 mm'), c('', 'Pied à coulisse numérique'), c('Poids étalon 1 kg classe F1'),
+        c('', 'Burette 50 mL'), c('Température (°C)', 'Thermomètre'), c('Masse (g)', 'Balance — poids étalons classe F1')];
+      log(JSON.stringify(got) === JSON.stringify([F[0], F[0], F[1], F[2], 'Autre', 'Autre']), 'Familles exclues : classification par mots-clés', JSON.stringify(got));
     }
     // Cas de test du cahier des charges CalibFit (tolérance 1e-6)
     {

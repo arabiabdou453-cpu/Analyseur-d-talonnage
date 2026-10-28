@@ -91,9 +91,9 @@
               <label class="field"><span data-i18n="f.certificate"></span><input id="m-certificate" data-i18n-ph="ph.optional" autocomplete="off"></label>
               <label class="field"><span data-i18n="f.date"></span><input id="m-date" type="date"></label>
               <label class="field full"><span data-i18n="f.lab"></span><input id="m-lab" data-i18n-ph="ph.optional" autocomplete="off"></label>
-              <label class="field"><span data-i18n="f.unitI"></span><input id="m-unitI" placeholder="°C, bar, g…" autocomplete="off"></label>
-              <label class="field"><span data-i18n="f.unitC"></span><input id="m-unitC" placeholder="°C, bar, g…" autocomplete="off"></label>
-              <label class="field"><span data-i18n="f.unitU"></span><input id="m-unitU" placeholder="°C, bar, g…" autocomplete="off"></label>
+              <label class="field"><span data-i18n="f.grandeur"></span><select id="m-grandeur"></select></label>
+              <label class="field"><span data-i18n="f.unit"></span><select id="m-unit"></select></label>
+              <input type="hidden" id="m-unitI"><input type="hidden" id="m-unitC"><input type="hidden" id="m-unitU">
               <label class="field"><span data-i18n="f.nature"></span>
                 <select id="m-nature">
                   <option value="" data-i18n="nature.unknown"></option>
@@ -239,6 +239,7 @@
   <dialog id="pdfDialog" class="dlg"><div id="pdfBody"></div></dialog>
   <input type="file" id="csvFile" accept=".csv,.txt,.pdf,text/csv,application/pdf" hidden>
   <input type="file" id="sessionFile" accept=".json,application/json" hidden>
+  <script src="referentiel.js"></script>
   <script src="core.js"></script>
   <script src="xlsx.js"></script>
   <script src="app.js"></script>

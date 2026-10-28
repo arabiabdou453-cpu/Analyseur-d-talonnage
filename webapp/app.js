@@ -103,6 +103,10 @@
       'pdf.sub': 'وُجدت {n} سلسلة. اختر السلسلة التي تريد تحليلها.',
       'pdf.verify': 'راجع القيم مقابل الشهادة الأصلية قبل التحليل. التصحيح = − الخطأ (المرجع − الجهاز).',
       'pdf.ref': 'المرجع', 'pdf.eq': 'الجهاز', 'pdf.err': 'الخطأ', 'pdf.points': '{n} نقاط',
+      'f.grandeur': 'الكمية', 'f.unit': 'الوحدة', 'ph.choose': '— اختر —', 'btn.importOther': 'استيراد شهادة أخرى',
+      'pdf.excludedTitle': 'الاستيفاء والنمذجة غير قابلين للتطبيق',
+      'pdf.excludedText': 'نتائج معايرة عائلة « {famille} » تُحدَّد نقطةً بنقطة، بقيم خاصة بكل معيار أو جهاز. لذلك لا يمكن تطبيق الاستيفاء ولا النمذجة بالانحدار الخطي. يُرجى استعمال القيم وعدم اليقين الواردة في الشهادة مباشرة.',
+      'pdf.excludedNote': 'تم تجاهل {n} سلسلة (عائلة غير قابلة للتطبيق: {f}).',
       'pdf.none': 'لم يُعثر على جدول نتائج (مرجع · جهاز · خطأ · ±U) في هذا الملف.',
       'pdf.scanned': 'لا يحتوي الملف على نص قابل للقراءة (ربما صورة ممسوحة ضوئيًا). أدخل القيم يدويًا.',
       'err.pdfLib': 'تعذّر تحميل قارئ PDF (يلزم اتصال بالإنترنت، أو أن الملف لم يجتز فحص السلامة).',
@@ -225,6 +229,10 @@
       'pdf.sub': '{n} série(s) trouvée(s). Choisissez celle à analyser.',
       'pdf.verify': 'Vérifiez les valeurs avec le certificat original avant l’analyse. Correction = − Erreur (référence − équipement).',
       'pdf.ref': 'Référence', 'pdf.eq': 'Équipement', 'pdf.err': 'Erreur', 'pdf.points': '{n} points',
+      'f.grandeur': 'Grandeur', 'f.unit': 'Unité', 'ph.choose': '— Choisir —', 'btn.importOther': 'Importer un autre certificat',
+      'pdf.excludedTitle': 'Interpolation et modélisation non applicables',
+      'pdf.excludedText': 'Les résultats d’étalonnage de la famille « {famille} » sont établis point par point, avec des valeurs propres à chaque étalon ou instrument. Une interpolation et une modélisation par régression linéaire ne sont donc pas applicables. Veuillez exploiter directement les valeurs et les incertitudes figurant sur le certificat.',
+      'pdf.excludedNote': '{n} série(s) ignorée(s) : famille non applicable ({f}).',
       'pdf.none': 'Aucun tableau de résultats (référence · équipement · erreur · ±U) trouvé dans ce fichier.',
       'pdf.scanned': 'Le fichier ne contient pas de texte lisible (probablement un scan). Saisissez les valeurs manuellement.',
       'err.pdfLib': 'Impossible de charger le lecteur PDF (connexion Internet requise, ou contrôle d’intégrité échoué).',
@@ -418,7 +426,26 @@
   META_FIELDS.forEach(f => $('m-' + f).addEventListener('input', () => { changed(); updateUnits(); }));
   ['s-alphaC', 's-alphaU', 's-limitC', 's-limitU'].forEach(id => $(id).addEventListener('input', changed));
 
+  /* Grandeur puis unité (EtalonnageRef.GRANDEURS) : l'unité s'applique à l'indication, à la correction et à l'incertitude. */
+  const REF = window.EtalonnageRef;
+  const optionsHtml = (vals, sel) => vals.map(v => `<option value="${esc(v)}"${v === sel ? ' selected' : ''}>${esc(v)}</option>`).join('');
+  function setUnit(u) { ['unitI', 'unitC', 'unitU'].forEach(f => { $('m-' + f).value = u; }); updateUnits(); changed(); }
+  function syncUnitSelects(u) {
+    const same = v => v.toLowerCase() === u.toLowerCase();
+    const g = REF.GRANDEURS.find(x => x.unites.includes(u)) || REF.GRANDEURS.find(x => x.unites.some(same));
+    const canon = g ? (g.unites.includes(u) ? u : g.unites.find(same)) : u;
+    $('m-grandeur').innerHTML = `<option value="">${esc(t('ph.choose'))}</option>` + optionsHtml(REF.GRANDEURS.map(x => x.nom), g ? g.nom : '');
+    $('m-unit').innerHTML = g ? optionsHtml(g.unites, canon) : `<option value="${esc(u)}">${esc(u || '—')}</option>`;
+    if (canon !== u) ['unitI', 'unitC', 'unitU'].forEach(f => { if ($('m-' + f).value === u) $('m-' + f).value = canon; });
+  }
+  $('m-grandeur').addEventListener('change', () => {
+    const g = REF.GRANDEURS.find(x => x.nom === $('m-grandeur').value);
+    setUnit(g ? g.unites[0] : '');
+  });
+  $('m-unit').addEventListener('change', () => setUnit($('m-unit').value));
+
   function updateUnits() {
+    syncUnitSelects($('m-unitI').value || $('m-unitC').value || $('m-unitU').value);
     const m = readMeta();
     const wrap = u => (u ? `(${esc(u)})` : '');
     document.querySelectorAll('.unit-i').forEach(el => { el.innerHTML = wrap(m.unitI); });
@@ -865,13 +892,26 @@
     if (state.lastResult) { state.history.push(state.lastResult); renderHistory(); }
   }
 
-  const EXAMPLE = [['0', '0,1', '0,2'], ['10', '0,2', '0,22'], ['20', '0,3', '0,24'], ['30', '0,4', '0,26']];
+  /* Exemples (EtalonnageRef.EXEMPLES) en cycle mélangé : jamais deux fois le même de suite. */
+  let exampleQueue = [], lastExample = -1;
+  function nextExample() {
+    if (!exampleQueue.length) {
+      exampleQueue = REF.EXEMPLES.map((_, i) => i);
+      for (let i = exampleQueue.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [exampleQueue[i], exampleQueue[j]] = [exampleQueue[j], exampleQueue[i]];
+      }
+      if (exampleQueue[0] === lastExample) exampleQueue.push(exampleQueue.shift());
+    }
+    return (lastExample = exampleQueue.shift());
+  }
 
   function loadExample() {
-    setRows(EXAMPLE.map(r => r.map(v => (state.lang === 'fr' ? v : v.replace(',', '.')))));
-    $('m-instrument').value = state.lang === 'fr' ? 'Thermomètre numérique' : 'ميزان حرارة رقمي';
-    $('m-certificate').value = 'CE-2026-0142';
-    $('m-unitI').value = '°C'; $('m-unitC').value = '°C'; $('m-unitU').value = '°C';
+    const ex = REF.EXEMPLES[nextExample()];
+    setRows(ex.points.map(r => r.map(rawStr)));
+    $('m-instrument').value = state.lang === 'fr' ? ex.instrument : ex.instrumentAr;
+    $('m-certificate').value = ex.certificat;
+    ['unitI', 'unitC', 'unitU'].forEach(f => { $('m-' + f).value = ex.unite; });
     $('m-nature').value = 'U';
     $('m-k').value = '2'; $('m-uncType').value = 'absolute';
     state.kVerified = true; updateKPill(); // jeu d'exemple : k = 2 fait partie des données
@@ -990,6 +1030,7 @@
       if (!ok) current.inconsistent = true;
     });
     const full = rows.join('\n');
+    series.forEach(s => { s.famille = Core.classerFamille(s.title, full); });
     const after = re => { const m = full.match(re); return m ? m[1].replace(/\s{2,}/g, ' ').trim() : ''; };
     let date = after(/Date d['’]?\s*[ée]talonnage\s*:?\s*(\d{4}-\d{2}-\d{2}|\d{2}[/.-]\d{2}[/.-]\d{4})/i) || after(/\b(\d{4}-\d{2}-\d{2})\b/);
     const dm = date.match(/^(\d{2})[/.-](\d{2})[/.-](\d{4})$/);
@@ -1003,7 +1044,7 @@
       // Nature U seulement si le certificat parle explicitement d'incertitude élargie (jamais déduite de « k = 2 »).
       nature: /incerti\w*\s+[ée]largie|expanded\s+uncertainty/i.test(full) ? 'U' : '',
     };
-    return { series: series.filter(s => s.points.length), meta, hasText: full.replace(/\s/g, '').length > 20 };
+    return { series: series.filter(s => s.points.length), famille: Core.classerFamille('', full), meta,hasText: full.replace(/\s/g, '').length > 20 };
   }
 
   async function importPdf(file) {
@@ -1012,8 +1053,30 @@
     const rows = await pdfRows(await file.arrayBuffer());
     const parsed = parseCertificate(rows);
     if (!parsed.hasText) throw new Error(t('pdf.scanned'));
+    // Familles exclues : séries ignorées ; si toutes le sont, ni vérification, ni calcul, ni export.
+    const exclue = s => REF.FAMILLES_EXCLUES.includes(s.famille);
+    const ignored = parsed.series.filter(exclue);
+    parsed.series = parsed.series.filter(s => !exclue(s));
+    if (!parsed.series.length && (ignored.length || exclue(parsed))) { showExcluded((ignored[0] || parsed).famille, file.name); return; }
     if (!parsed.series.length) throw new Error(t('pdf.none'));
+    parsed.ignored = ignored;
     showPdfDialog(parsed, file.name);
+  }
+
+  function showExcluded(famille, fileName) {
+    const dlg = $('pdfDialog');
+    $('pdfBody').innerHTML = `
+      <div class="dlg-head">
+        <div><h2>${icon('alert')}<span>${t('pdf.excludedTitle')}</span></h2><p class="card-sub">${esc(fileName)}</p></div>
+        <button class="icon-btn" type="button" data-close aria-label="${t('btn.cancel')}">${icon('x')}</button>
+      </div>
+      <div class="alert warn">${icon('alert')}<span>${esc(t('pdf.excludedText', { famille }))}</span></div>
+      <button class="btn primary" type="button" data-other>${icon('upload')}<span>${t('btn.importOther')}</span></button>`;
+    dlg.onclick = e => {
+      if (e.target === dlg || e.target.closest('[data-close]')) { dlg.close(); return; }
+      if (e.target.closest('[data-other]')) { dlg.close(); $('csvFile').click(); }
+    };
+    dlg.showModal();
   }
 
   function showPdfDialog(parsed, fileName) {
@@ -1027,6 +1090,7 @@
         <button class="icon-btn" type="button" data-close aria-label="${t('btn.cancel')}">${icon('x')}</button>
       </div>
       <div class="alert info">${icon('info')}<span>${t('pdf.verify')}</span></div>
+      ${parsed.ignored.length ? `<div class="alert warn">${icon('alert')}<span>${esc(t('pdf.excludedNote', { n: parsed.ignored.length, f: [...new Set(parsed.ignored.map(s => s.famille))].join(', ') }))}</span></div>` : ''}
       ${parsed.series.map((s, i) => `
         <div class="series">
           <div class="series-head">
@@ -1124,7 +1188,7 @@
     $('langBtn').textContent = state.lang === 'ar' ? 'FR' : 'ع';
     $('langBtn').title = state.lang === 'ar' ? 'Français' : 'العربية';
     $('pointsCard').dataset.drop = t('drop2');
-    setMode(state.mode); renumber(); renderSummary();
+    setMode(state.mode); renumber(); renderSummary(); updateUnits();
     if (state.tab === 'analysis') renderAnalysis();
     if (state.tab === 'calc') renderCalc();
     if (state.tab === 'report') renderReport();

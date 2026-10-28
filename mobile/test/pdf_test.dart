@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:analyseur_etalonnage/core/certificate.dart';
 import 'package:analyseur_etalonnage/core/engine.dart';
 import 'package:analyseur_etalonnage/core/pdf_text.dart';
+import 'package:analyseur_etalonnage/core/referentiel.dart';
 import 'package:archive/archive.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -140,5 +141,14 @@ void main() {
       expect(c.series, isEmpty);
       expect(c.hasText, isFalse); // moins de 20 caractères utiles
     });
+  });
+
+  test('familles exclues : classification par mots-clés', () {
+    expect(classerFamille('Cale étalon 25 mm'), famillesExclues[0]);
+    expect(classerFamille('', 'Pied à coulisse numérique'), famillesExclues[0]);
+    expect(classerFamille('Poids étalon 1 kg classe F1'), famillesExclues[1]);
+    expect(classerFamille('', 'Burette 50 mL'), famillesExclues[2]);
+    expect(classerFamille('Température (°C)', 'Thermomètre'), familleAutre);
+    expect(classerFamille('Masse (g)', 'Balance — poids étalons classe F1'), familleAutre); // pesage : les poids sont la référence
   });
 }

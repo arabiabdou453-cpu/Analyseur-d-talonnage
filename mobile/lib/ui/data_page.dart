@@ -4,6 +4,7 @@ import '../core/certificate.dart';
 import '../core/data_io.dart';
 import '../core/engine.dart';
 import '../core/pdf_text.dart';
+import '../core/referentiel.dart';
 import '../services/files.dart';
 import '../state/app_state.dart';
 import '../util/format.dart';
@@ -117,13 +118,41 @@ class _PointsCard extends StatelessWidget {
       }
       final cert = analyserCertificat(extrairePdfLignes(f.bytes));
       if (!cert.hasText) throw const CoreError('pdf.scanned');
-      if (cert.series.isEmpty) throw const CoreError('pdf.none');
+      // Familles exclues : séries ignorées ; si toutes le sont, ni vérification, ni calcul, ni export.
+      final ignored = cert.series.where((x) => famillesExclues.contains(x.famille)).toList();
+      final kept = cert.series.where((x) => !famillesExclues.contains(x.famille)).toList();
+      if (kept.isEmpty && (ignored.isNotEmpty || famillesExclues.contains(cert.famille))) {
+        if (!context.mounted) return;
+        final other = await showDialog<bool>(
+          context: context,
+          builder: (d) => AlertDialog(
+            title: Text(s.t('pdf.excludedTitle')),
+            content: AlertBox(s.t('pdf.excludedText', {'famille': ignored.isEmpty ? cert.famille : ignored.first.famille}), tone: Tone.warn),
+            actions: [
+              TextButton(onPressed: () => Navigator.pop(d, false), child: Text(s.t('btn.cancel'))),
+              FilledButton.icon(
+                icon: const Icon(Icons.upload_file),
+                label: Text(s.t('btn.importOther')),
+                onPressed: () => Navigator.pop(d, true),
+              ),
+            ],
+          ),
+        );
+        if ((other ?? false) && context.mounted) await _import(context, true);
+        return;
+      }
+      if (kept.isEmpty) throw const CoreError('pdf.none');
       if (!context.mounted) return;
       await showModalBottomSheet<void>(
         context: context,
         isScrollControlled: true,
         showDragHandle: true,
-        builder: (c) => _CertificateSheet(state: s, cert: cert, fileName: f.name),
+        builder: (c) => _CertificateSheet(
+          state: s,
+          cert: Certificate(kept, cert.meta, hasText: cert.hasText, famille: cert.famille),
+          ignored: ignored,
+          fileName: f.name,
+        ),
       );
     } on CoreError catch (e) {
       final msg = e.code.startsWith('pdf.') ? s.t(e.code) : s.errorText(e);
@@ -244,6 +273,7 @@ class _MetaCard extends StatelessWidget {
         );
     Widget pair(Widget a, Widget b) => Row(children: [Expanded(child: a), const SizedBox(width: 10), Expanded(child: b)]);
     const gap = SizedBox(height: 10);
+    final unite = trouverUnite(s.metaCtl['unitI']!.text.trim());
     return SectionCard(
       title: s.t('meta.title'),
       icon: Icons.description_outlined,
@@ -254,9 +284,29 @@ class _MetaCard extends StatelessWidget {
         gap,
         pair(field('date', 'f.date', ltr: true), field('lab', 'f.lab')),
         gap,
-        pair(field('unitI', 'f.unitI'), field('unitC', 'f.unitC')),
+        pair(
+          DropdownButtonFormField<String>(
+            key: ValueKey('grandeur-${unite.grandeur?.nom}'),
+            isExpanded: true,
+            initialValue: unite.grandeur?.nom,
+            decoration: InputDecoration(labelText: s.t('f.grandeur'), isDense: true, border: const OutlineInputBorder()),
+            items: [for (final g in grandeurs) DropdownMenuItem(value: g.nom, child: Text(g.nom, overflow: TextOverflow.ellipsis))],
+            onChanged: (v) => s.setUnit(grandeurs.firstWhere((g) => g.nom == v).unites.first),
+          ),
+          DropdownButtonFormField<String>(
+            key: ValueKey('unite-${unite.unite}'),
+            isExpanded: true,
+            initialValue: unite.unite.isEmpty ? null : unite.unite,
+            decoration: InputDecoration(labelText: s.t('f.unit'), isDense: true, border: const OutlineInputBorder()),
+            items: [
+              for (final u in unite.grandeur?.unites ?? [if (unite.unite.isNotEmpty) unite.unite])
+                DropdownMenuItem(value: u, child: Text(u)),
+            ],
+            onChanged: (v) => s.setUnit(v ?? ''),
+          ),
+        ),
         gap,
-        pair(field('unitU', 'f.unitU'), field('k', 'f.k', ltr: true)),
+        field('k', 'f.k', ltr: true),
         if (!s.kVerified)
           Align(
             alignment: AlignmentDirectional.centerEnd,
@@ -335,9 +385,12 @@ class _CriteriaCard extends StatelessWidget {
 
 /// Revue obligatoire des valeurs extraites d'un PDF avant chargement (F3).
 class _CertificateSheet extends StatelessWidget {
-  const _CertificateSheet({required this.state, required this.cert, required this.fileName});
+  const _CertificateSheet({required this.state, required this.cert, required this.ignored, required this.fileName});
   final AppState state;
   final Certificate cert;
+
+  /// Séries d'une famille exclue, retirées de [cert] et signalées par une note.
+  final List<CertSeries> ignored;
   final String fileName;
 
   @override
@@ -361,6 +414,11 @@ class _CertificateSheet extends StatelessWidget {
           Text(s.t('pdf.sub', {'n': cert.series.length}), style: theme.textTheme.bodySmall),
           const SizedBox(height: 12),
           AlertBox(s.t('pdf.verify')),
+          if (ignored.isNotEmpty)
+            AlertBox(
+              s.t('pdf.excludedNote', {'n': ignored.length, 'f': ignored.map((x) => x.famille).toSet().join(', ')}),
+              tone: Tone.warn,
+            ),
           for (final serie in cert.series)
             Card(
               color: theme.colorScheme.surfaceContainerLow,
