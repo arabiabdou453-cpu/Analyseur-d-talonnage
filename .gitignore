@@ -23,3 +23,7 @@ desktop.ini
 
 # Icônes de l'application mobile (générées par Flutter) : à versionner
 !mobile/**/*.png
+
+# Binaires Android générés
+*.apk
+*.aab
