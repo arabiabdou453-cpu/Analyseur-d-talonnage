@@ -69,7 +69,7 @@ class _LoginPageState extends State<LoginPage> {
       setState(() => _error = 'auth.invalidEmail');
       return;
     }
-    if (_register && password.length < 8) {
+    if (_register && (password.length < 8 || !RegExp('[a-z]').hasMatch(password) || !RegExp(r'\d').hasMatch(password))) {
       setState(() => _error = 'auth.weakPassword');
       return;
     }

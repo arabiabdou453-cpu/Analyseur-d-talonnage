@@ -46,7 +46,7 @@ class FirebaseAuthService implements AuthService {
         'invalid-email' => 'auth.invalidEmail',
         'invalid-credential' || 'wrong-password' || 'user-not-found' => 'auth.badCredentials',
         'email-already-in-use' => 'auth.emailInUse',
-        'weak-password' => 'auth.weakPassword',
+        'weak-password' || 'password-does-not-meet-requirements' => 'auth.weakPassword',
         'too-many-requests' => 'auth.tooMany',
         'network-request-failed' => 'auth.network',
         'popup-closed-by-user' || 'cancelled-popup-request' || 'web-context-canceled' => 'auth.cancelled',

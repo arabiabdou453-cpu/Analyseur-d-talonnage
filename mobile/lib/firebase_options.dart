@@ -16,7 +16,7 @@ const FirebaseOptions _web = FirebaseOptions(
 );
 
 const FirebaseOptions _android = FirebaseOptions(
-  apiKey: 'AIzaSyAcpd4pD6Vjn0Uw__enH_-J_bmxbJS8BRA',
+  apiKey: 'AIzaSyBigDMoCMmhro812Q13J0KEnW39MTEfxl4',
   projectId: 'analyseur-etalonnage',
   storageBucket: 'analyseur-etalonnage.firebasestorage.app',
   messagingSenderId: '417632828391',
