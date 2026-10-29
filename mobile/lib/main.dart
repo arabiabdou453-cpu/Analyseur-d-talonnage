@@ -1,23 +1,37 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
+import 'firebase_options.dart';
+import 'services/auth.dart';
 import 'state/app_state.dart';
 import 'ui/analysis_page.dart';
 import 'ui/calc_page.dart';
 import 'ui/common.dart';
 import 'ui/data_page.dart';
+import 'ui/login_page.dart';
 import 'ui/report_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final state = AppState();
   await state.restore();
-  runApp(EtalonnageApp(state: state));
+  // Connexion obligatoire dès que Firebase est configuré pour la plateforme (voir firebase_options.dart).
+  final options = firebaseOptions;
+  AuthService? auth;
+  if (options != null) {
+    await Firebase.initializeApp(options: options);
+    auth = FirebaseAuthService();
+  }
+  runApp(EtalonnageApp(state: state, auth: auth));
 }
 
 class EtalonnageApp extends StatelessWidget {
-  const EtalonnageApp({super.key, required this.state});
+  const EtalonnageApp({super.key, required this.state, this.auth});
   final AppState state;
+
+  /// Null : pas d'écran de connexion (plateforme non configurée).
+  final AuthService? auth;
 
   ThemeData _theme(Brightness b) {
     final scheme = ColorScheme.fromSeed(seedColor: Palette.primary, brightness: b);
@@ -52,7 +66,7 @@ class EtalonnageApp extends StatelessWidget {
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
-          home: const HomeShell(),
+          home: auth == null ? const HomeShell() : AuthGate(auth: auth!, child: HomeShell(auth: auth)),
         ),
       ),
     );
@@ -60,7 +74,8 @@ class EtalonnageApp extends StatelessWidget {
 }
 
 class HomeShell extends StatefulWidget {
-  const HomeShell({super.key});
+  const HomeShell({super.key, this.auth});
+  final AuthService? auth;
 
   @override
   State<HomeShell> createState() => _HomeShellState();
@@ -114,6 +129,12 @@ class _HomeShellState extends State<HomeShell> {
             icon: Icon(theme.brightness == Brightness.dark ? Icons.light_mode_outlined : Icons.dark_mode_outlined),
             onPressed: () => s.toggleTheme(theme.brightness),
           ),
+          if (widget.auth != null)
+            IconButton(
+              tooltip: '${s.t('auth.signOut')} (${widget.auth!.current?.email ?? ''})',
+              icon: const Icon(Icons.logout),
+              onPressed: widget.auth!.signOut,
+            ),
           const SizedBox(width: 4),
         ],
       ),

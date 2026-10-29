@@ -1,6 +1,9 @@
 // Parcours complet de l'interface : exemple → analyse → calcul, en français
 // puis en arabe (sens de lecture de droite à gauche).
+import 'dart:async';
+
 import 'package:analyseur_etalonnage/main.dart';
+import 'package:analyseur_etalonnage/services/auth.dart';
 import 'package:analyseur_etalonnage/state/app_state.dart';
 import 'package:analyseur_etalonnage/ui/analysis_page.dart';
 import 'package:analyseur_etalonnage/ui/calc_page.dart';
@@ -86,4 +89,65 @@ void main() {
     expect(dir, TextDirection.rtl);
     await tester.pump(const Duration(seconds: 1)); // laisse passer l'enregistrement différé du brouillon
   });
+
+  testWidgets('connexion obligatoire : email + mot de passe, puis déconnexion', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    tester.view.devicePixelRatio = 3;
+    tester.view.physicalSize = const Size(1080, 2340);
+    addTearDown(tester.view.reset);
+    final state = AppState();
+    await state.restore();
+    final auth = _FakeAuth();
+    await tester.pumpWidget(EtalonnageApp(state: state, auth: auth));
+    await tester.pumpAndSettle();
+    expect(find.text('Continuer avec Google'), findsOneWidget);
+    expect(find.byType(NavigationBar), findsNothing); // application inaccessible avant connexion
+
+    final fields = find.byType(TextField);
+    await tester.enterText(fields.at(0), 'metrologue@example.com');
+    await tester.enterText(fields.at(1), 'mauvais');
+    await tester.tap(find.text('Se connecter'));
+    await tester.pumpAndSettle();
+    expect(find.text('Email ou mot de passe incorrect.'), findsOneWidget);
+
+    await tester.enterText(fields.at(1), 'motdepasse-test');
+    await tester.tap(find.text('Se connecter'));
+    await tester.pumpAndSettle();
+    expect(find.byType(NavigationBar), findsOneWidget);
+
+    await tester.tap(find.byIcon(Icons.logout));
+    await tester.pumpAndSettle();
+    expect(find.text('Continuer avec Google'), findsOneWidget);
+    await tester.pump(const Duration(seconds: 1));
+  });
+}
+
+class _FakeAuth implements AuthService {
+  final _ctl = StreamController<AuthUser?>.broadcast();
+  AuthUser? _user;
+
+  @override
+  Stream<AuthUser?> get userChanges => _ctl.stream;
+  @override
+  AuthUser? get current => _user;
+
+  void _set(AuthUser? u) {
+    _user = u;
+    _ctl.add(u);
+  }
+
+  @override
+  Future<void> signInWithEmail(String email, String password) async {
+    if (password != 'motdepasse-test') throw const AuthError('auth.badCredentials');
+    _set(AuthUser(email, ''));
+  }
+
+  @override
+  Future<void> signInWithGoogle() async => _set(const AuthUser('g@example.com', 'G'));
+  @override
+  Future<void> register(String email, String password) async => _set(AuthUser(email, ''));
+  @override
+  Future<void> resetPassword(String email) async {}
+  @override
+  Future<void> signOut() async => _set(null);
 }

@@ -1,9 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-    <!-- Sécurité : l'application fonctionne hors ligne. Aucune permission réseau en
-         production, même si une bibliothèque en déclarait une (le manifeste debug
-         garde INTERNET pour le rechargement à chaud). -->
-    <uses-permission android:name="android.permission.INTERNET" tools:node="remove" />
+    <!-- Réseau uniquement pour la connexion (Firebase Authentication) : les données
+         d'étalonnage restent sur l'appareil. -->
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:label="Étalonnage"
