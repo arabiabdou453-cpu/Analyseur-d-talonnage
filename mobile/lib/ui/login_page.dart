@@ -38,6 +38,7 @@ class _LoginPageState extends State<LoginPage> {
   final _password = TextEditingController();
   bool _register = false, _busy = false, _hide = true;
   String? _error, _info;
+  String _detail = '';
 
   @override
   void dispose() {
@@ -50,14 +51,25 @@ class _LoginPageState extends State<LoginPage> {
     setState(() {
       _busy = true;
       _error = null;
+      _detail = '';
       _info = null;
     });
     try {
       await action();
     } on AuthError catch (e) {
-      if (mounted) setState(() => _error = e.code);
-    } catch (_) {
-      if (mounted) setState(() => _error = 'auth.failed');
+      if (mounted) {
+        setState(() {
+          _error = e.code;
+          _detail = e.detail;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _error = 'auth.failed';
+          _detail = e.runtimeType.toString();
+        });
+      }
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -67,6 +79,10 @@ class _LoginPageState extends State<LoginPage> {
     final email = _email.text.trim(), password = _password.text;
     if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(email)) {
       setState(() => _error = 'auth.invalidEmail');
+      return;
+    }
+    if (password.isEmpty) {
+      setState(() => _error = 'auth.missingPassword');
       return;
     }
     if (_register && (password.length < 8 || !RegExp('[a-z]').hasMatch(password) || !RegExp(r'\d').hasMatch(password))) {
@@ -145,7 +161,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ),
-                if (_error != null) ...[const SizedBox(height: 12), AlertBox(s.t(_error!), tone: Tone.error)],
+                if (_error != null) ...[const SizedBox(height: 12), AlertBox(_error == 'auth.failed' && _detail.isNotEmpty ? '${s.t(_error!)} ($_detail)' : s.t(_error!), tone: Tone.error)],
                 if (_info != null) ...[const SizedBox(height: 12), AlertBox(s.t(_info!), tone: Tone.ok)],
                 const SizedBox(height: 16),
                 FilledButton(

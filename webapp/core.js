@@ -195,8 +195,11 @@
       || 'Autre';
   }
 
+  /* Exemples proposés : aucun ne peut relever d'une famille exclue. */
+  const exemplesAutorises = () => root.EtalonnageRef.EXEMPLES.filter(e => !root.EtalonnageRef.FAMILLES_EXCLUES.includes(classerFamille(`${e.instrument} ${e.grandeur}`)));
+
   root.EtalonnageCore = Object.freeze({
     TOL, CoreError, parseNum, ajusterDroite, evaluerCritere, valider, analyser, interpolation, calculer, ligneCertificat,
-    alerteLinearite, arrondirIncertitude, classerFamille,
+    alerteLinearite, arrondirIncertitude, classerFamille, exemplesAutorises,
   });
 })(typeof window !== 'undefined' ? window : globalThis);

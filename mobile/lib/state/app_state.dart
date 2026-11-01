@@ -155,11 +155,11 @@ class AppState extends ChangeNotifier {
 
   void loadExample() {
     if (_exampleQueue.isEmpty) {
-      _exampleQueue.addAll(List.generate(exemples.length, (i) => i)..shuffle(_rng));
+      _exampleQueue.addAll(List.generate(exemplesAutorises.length, (i) => i)..shuffle(_rng));
       if (_exampleQueue.first == _lastExample) _exampleQueue.add(_exampleQueue.removeAt(0));
     }
     _lastExample = _exampleQueue.removeAt(0);
-    final ex = exemples[_lastExample];
+    final ex = exemplesAutorises[_lastExample];
     _setRows([for (final p in ex.points) [for (final v in p) rawNum(v, lang)]]);
     metaCtl['instrument']!.text = lang == 'fr' ? ex.instrument : ex.instrumentAr;
     metaCtl['certificate']!.text = ex.certificat;

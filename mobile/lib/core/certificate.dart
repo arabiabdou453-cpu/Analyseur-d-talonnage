@@ -172,3 +172,7 @@ String classerFamille(String texteSerie, [String texteDocument = '']) {
       chercher(doc, RegExp('balance|pesage|ipfna').hasMatch(doc) ? 1 : -1) ??
       familleAutre;
 }
+
+/// Exemples proposés : aucun ne peut relever d'une famille exclue.
+final List<Exemple> exemplesAutorises =
+    exemples.where((e) => !famillesExclues.contains(classerFamille('${e.instrument} ${e.grandeur}'))).toList();

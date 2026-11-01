@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../core/certificate.dart';
@@ -108,7 +109,7 @@ class _PointsCard extends StatelessWidget {
     final messenger = ScaffoldMessenger.of(context);
     final errorColor = Theme.of(context).colorScheme.error;
     try {
-      final f = await pickFile(pdf ? const ['pdf'] : const ['csv', 'txt'], maxBytes: pdf ? maxPdfBytes : maxTextBytes);
+      final f = await pickFile(pdf ? const ['pdf'] : const ['csv', 'txt'], maxBytes: pdf ? maxPdfBytes : maxTextBytes, tooLargeCode: pdf ? 'pdf.tooLarge' : 'tooLarge');
       if (f == null) return;
       if (!pdf) {
         final rows = parseCsv(f.text);
@@ -116,7 +117,17 @@ class _PointsCard extends StatelessWidget {
         messenger.showSnackBar(SnackBar(content: Text(s.t('toast.imported', {'n': rows.length}))));
         return;
       }
-      final cert = analyserCertificat(extrairePdfLignes(f.bytes));
+      // Extraction hors du fil de l'interface, avec indicateur.
+      messenger.showSnackBar(SnackBar(
+        duration: const Duration(minutes: 10),
+        content: Row(children: [
+          const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)),
+          const SizedBox(width: 12),
+          Expanded(child: Text(s.t('pdf.reading'))),
+        ]),
+      ));
+      final lignes = await compute(extrairePdfLignes, f.bytes).whenComplete(messenger.hideCurrentSnackBar);
+      final cert = analyserCertificat(lignes);
       if (!cert.hasText) throw const CoreError('pdf.scanned');
       // Familles exclues : séries ignorées ; si toutes le sont, ni vérification, ni calcul, ni export.
       final ignored = cert.series.where((x) => famillesExclues.contains(x.famille)).toList();

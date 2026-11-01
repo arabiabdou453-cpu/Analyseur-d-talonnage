@@ -3,6 +3,9 @@
 (function (global) {
   'use strict';
 
+  /* Taille maximale d'un certificat PDF (Mo). */
+  const MAX_UPLOAD_MB = 200;
+
   /* Familles dont les résultats sont établis point par point : ni interpolation ni modélisation. */
   const FAMILLES_EXCLUES = ['Dimensionnel', 'Masses étalons (poids)', 'Instruments de volume (verrerie)'];
 
@@ -49,5 +52,5 @@
       points: [[2, 0.05, 0.06], [5, 0.08, 0.08], [10, 0.12, 0.11], [20, 0.20, 0.18], [40, 0.35, 0.30]] },
   ];
 
-  global.EtalonnageRef = Object.freeze({ FAMILLES_EXCLUES, GRANDEURS, EXEMPLES });
+  global.EtalonnageRef = Object.freeze({ MAX_UPLOAD_MB, FAMILLES_EXCLUES, GRANDEURS, EXEMPLES });
 })(typeof window !== 'undefined' ? window : globalThis);

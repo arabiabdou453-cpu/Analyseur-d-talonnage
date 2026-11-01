@@ -128,6 +128,11 @@
         c('', 'Burette 50 mL'), c('Température (°C)', 'Thermomètre'), c('Masse (g)', 'Balance — poids étalons classe F1')];
       log(JSON.stringify(got) === JSON.stringify([F[0], F[0], F[1], F[2], 'Autre', 'Autre']), 'Familles exclues : classification par mots-clés', JSON.stringify(got));
     }
+    // Exemples : aucune famille exclue
+    {
+      const ex = K.exemplesAutorises();
+      log(ex.length >= 5 && ex.length === window.EtalonnageRef.EXEMPLES.length, "Exemples : aucun n'appartient aux familles exclues");
+    }
     // Cas de test du cahier des charges CalibFit (tolérance 1e-6)
     {
       const rows = [[0, '0,10', '0,05'], [20, '0,00', '0,06'], [40, '-0,10', '0,08'], [60, '-0,10', '0,08'], [80, '-0,20', '0,09'], [100, '-0,30', '0,10']]

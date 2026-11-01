@@ -108,9 +108,11 @@ void main() {
     await tester.enterText(fields.at(1), 'mauvais');
     await tester.tap(find.text('Se connecter'));
     await tester.pumpAndSettle();
-    expect(find.text('Email ou mot de passe incorrect.'), findsOneWidget);
+    expect(find.textContaining('Email ou mot de passe incorrect.'), findsOneWidget);
 
     await tester.enterText(fields.at(1), 'motdepasse-test');
+    await tester.ensureVisible(find.text('Se connecter')); // le message d'erreur allonge le formulaire
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Se connecter'));
     await tester.pumpAndSettle();
     expect(find.byType(NavigationBar), findsOneWidget);

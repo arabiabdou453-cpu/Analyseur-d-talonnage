@@ -110,7 +110,8 @@
       'pdf.none': 'لم يُعثر على جدول نتائج (مرجع · جهاز · خطأ · ±U) في هذا الملف.',
       'pdf.scanned': 'لا يحتوي الملف على نص قابل للقراءة (ربما صورة ممسوحة ضوئيًا). أدخل القيم يدويًا.',
       'err.pdfLib': 'تعذّر تحميل قارئ PDF (يلزم اتصال بالإنترنت، أو أن الملف لم يجتز فحص السلامة).',
-      'err.tooLarge': 'الملف كبير جدًا (الحد: 20 ميغابايت لـ PDF، 2 ميغابايت لـ CSV/JSON).',
+      'err.pdfTooLarge': 'الملف كبير جدًا (الحد الأقصى {n} ميغابايت)',
+      'err.tooLarge': 'الملف كبير جدًا (الحد: 2 ميغابايت لـ CSV/JSON).',
       'err.pdfRead': 'تعذّرت قراءة ملف PDF.',
       'toast.pdf': 'تم تحميل {n} نقاط من الشهادة',
       'series': 'سلسلة',
@@ -236,7 +237,8 @@
       'pdf.none': 'Aucun tableau de résultats (référence · équipement · erreur · ±U) trouvé dans ce fichier.',
       'pdf.scanned': 'Le fichier ne contient pas de texte lisible (probablement un scan). Saisissez les valeurs manuellement.',
       'err.pdfLib': 'Impossible de charger le lecteur PDF (connexion Internet requise, ou contrôle d’intégrité échoué).',
-      'err.tooLarge': 'Fichier trop volumineux (limite : 20 Mo pour un PDF, 2 Mo pour CSV/JSON).',
+      'err.pdfTooLarge': 'Fichier trop volumineux (maximum {n} Mo)',
+      'err.tooLarge': 'Fichier trop volumineux (limite : 2 Mo pour CSV/JSON).',
       'err.pdfRead': 'Impossible de lire le fichier PDF.',
       'toast.pdf': '{n} points chargés depuis le certificat',
       'series': 'Série',
@@ -896,7 +898,7 @@
   let exampleQueue = [], lastExample = -1;
   function nextExample() {
     if (!exampleQueue.length) {
-      exampleQueue = REF.EXEMPLES.map((_, i) => i);
+      exampleQueue = Core.exemplesAutorises().map((_, i) => i);
       for (let i = exampleQueue.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [exampleQueue[i], exampleQueue[j]] = [exampleQueue[j], exampleQueue[i]];
@@ -907,7 +909,7 @@
   }
 
   function loadExample() {
-    const ex = REF.EXEMPLES[nextExample()];
+    const ex = Core.exemplesAutorises()[nextExample()];
     setRows(ex.points.map(r => r.map(rawStr)));
     $('m-instrument').value = state.lang === 'fr' ? ex.instrument : ex.instrumentAr;
     $('m-certificate').value = ex.certificat;
@@ -954,7 +956,7 @@
     lib: 'sha512-q+4liFwdPC/bNdhUpZx6aXDx/h77yEQtn4I1slHydcbZK34nLaR3cAeYSJshoxIOq3mjEf7xJE8YWIUHMn+oCQ==',
     worker: 'sha512-BbrZ76UNZq5BhH7LL7pn9A4TKQpQeNCHOo65/akfelcIBbcVvYWOFQKPXIrykE3qZxYjmDX573oa4Ywsc7rpTw==',
   };
-  const MAX_PDF = 20 * 1024 * 1024, MAX_TEXT = 2 * 1024 * 1024;
+  const MAX_PDF = REF.MAX_UPLOAD_MB * 1024 * 1024, MAX_TEXT = 2 * 1024 * 1024;
   let pdfjsReady = null;
   function loadPdfJs() {
     if (!pdfjsReady) {
@@ -1048,7 +1050,7 @@
   }
 
   async function importPdf(file) {
-    if (file.size > MAX_PDF) throw new Error(t('err.tooLarge'));
+    if (file.size > MAX_PDF) throw new Error(t('err.pdfTooLarge', { n: REF.MAX_UPLOAD_MB }));
     toast(t('pdf.reading'));
     const rows = await pdfRows(await file.arrayBuffer());
     const parsed = parseCertificate(rows);

@@ -22,13 +22,13 @@ class PickedFile {
 }
 
 /// Ouvre le sélecteur de fichiers ; null si l'utilisateur annule.
-Future<PickedFile?> pickFile(List<String> extensions, {required int maxBytes}) async {
+Future<PickedFile?> pickFile(List<String> extensions, {required int maxBytes, String tooLargeCode = 'tooLarge'}) async {
   final f = await FilePicker.pickFile(type: FileType.custom, allowedExtensions: extensions);
   if (f == null) return null;
   final size = await f.length();
-  if (size != null && size > maxBytes) throw const CoreError('tooLarge');
+  if (size != null && size > maxBytes) throw CoreError(tooLargeCode);
   final bytes = await f.readAsBytes();
-  if (bytes.length > maxBytes) throw const CoreError('tooLarge');
+  if (bytes.length > maxBytes) throw CoreError(tooLargeCode);
   return PickedFile(f.name, bytes);
 }
 

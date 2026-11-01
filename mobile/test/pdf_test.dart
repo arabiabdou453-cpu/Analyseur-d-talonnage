@@ -143,6 +143,11 @@ void main() {
     });
   });
 
+  test("exemples : aucun n'appartient aux familles exclues", () {
+    expect(exemplesAutorises.length, greaterThanOrEqualTo(5));
+    expect(exemplesAutorises.length, exemples.length);
+  });
+
   test('familles exclues : classification par mots-clés', () {
     expect(classerFamille('Cale étalon 25 mm'), famillesExclues[0]);
     expect(classerFamille('', 'Pied à coulisse numérique'), famillesExclues[0]);

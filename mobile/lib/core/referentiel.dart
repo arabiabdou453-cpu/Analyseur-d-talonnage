@@ -2,6 +2,9 @@
 /// familles exclues, grandeurs et unités proposées, exemples.
 library;
 
+/// Taille maximale d'un certificat PDF (Mo).
+const int maxUploadMb = 200;
+
 /// Familles dont les résultats sont établis point par point : ni interpolation ni modélisation.
 const List<String> famillesExclues = ['Dimensionnel', 'Masses étalons (poids)', 'Instruments de volume (verrerie)'];
 

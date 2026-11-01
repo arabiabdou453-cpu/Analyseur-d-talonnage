@@ -6,8 +6,9 @@ library;
 import 'dart:convert';
 
 import 'engine.dart';
+import 'referentiel.dart';
 
-const int maxPdfBytes = 20 * 1024 * 1024;
+const int maxPdfBytes = maxUploadMb * 1024 * 1024;
 const int maxTextBytes = 2 * 1024 * 1024;
 const int maxPoints = 500;
 
