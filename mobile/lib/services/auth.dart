@@ -5,7 +5,7 @@ library;
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+import 'package:google_sign_in_platform_interface/google_sign_in_platform_interface.dart';
 
 class AuthUser {
   const AuthUser(this.email, this.name);
@@ -56,7 +56,7 @@ class FirebaseAuthService implements AuthService {
         'weak-password' || 'password-does-not-meet-requirements' => 'auth.weakPassword',
         'too-many-requests' => 'auth.tooMany',
         'network-request-failed' => 'auth.network',
-        'popup-closed-by-user' || 'cancelled-popup-request' || 'web-context-canceled' => 'auth.cancelled',
+        'popup-closed-by-user' || 'cancelled-popup-request' || 'web-context-canceled' || 'web-context-cancelled' => 'auth.cancelled',
         'popup-blocked' => 'auth.popupBlocked',
         _ => 'auth.failed',
       }, e.code);
@@ -71,15 +71,18 @@ class FirebaseAuthService implements AuthService {
         final provider = GoogleAuthProvider()..setCustomParameters({'prompt': 'select_account'});
         if (kIsWeb) {
           await _auth.signInWithPopup(provider);
-        } else {
+        } else if (defaultTargetPlatform == TargetPlatform.android) {
           // Dialogue natif : la clé Android reste limitée à l'application signée.
-          final g = GoogleSignIn.instance;
+          final g = GoogleSignInPlatform.instance;
           if (!_googleReady) {
-            await g.initialize(clientId: _auth.app.options.iosClientId, serverClientId: _webClientId);
+            await g.init(const InitParameters(serverClientId: _webClientId));
             _googleReady = true;
           }
-          final account = await g.authenticate();
-          await _auth.signInWithCredential(GoogleAuthProvider.credential(idToken: account.authentication.idToken));
+          final result = await g.authenticate(const AuthenticateParameters());
+          await _auth.signInWithCredential(GoogleAuthProvider.credential(idToken: result.authenticationTokens.idToken));
+        } else {
+          // iOS : page Google via Firebase (le SDK Google natif est incompatible avec Firebase 13).
+          await _auth.signInWithProvider(provider);
         }
       });
 
@@ -96,7 +99,7 @@ class FirebaseAuthService implements AuthService {
 
   @override
   Future<void> signOut() async {
-    if (_googleReady) await GoogleSignIn.instance.signOut();
+    if (_googleReady) await GoogleSignInPlatform.instance.signOut(const SignOutParams());
     await _auth.signOut();
   }
 }
