@@ -1,0 +1,61 @@
+# Version iPhone : la compilation iOS exige un Mac, fournie ici par GitHub Actions.
+# Résultat : une IPA NON SIGNÉE publiée dans la release « ios-latest » ; aucun secret utilisé.
+name: iOS
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'mobile/**'
+      - '.github/workflows/ios.yml'
+
+permissions:
+  contents: write # publication de la release
+
+concurrency:
+  group: ios
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: macos-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Installer Flutter 3.47.8 (même version que le site et l'APK)
+        run: |
+          git clone --depth 1 -b 3.47.8 https://github.com/flutter/flutter.git "$HOME/flutter"
+          echo "$HOME/flutter/bin" >> "$GITHUB_PATH"
+
+      - name: Tests
+        run: |
+          flutter --version
+          flutter pub get
+          flutter test
+
+      - name: Compiler pour iPhone (sans signature)
+        run: flutter build ios --release --no-codesign --obfuscate --split-debug-info=build/symbols
+
+      - name: Créer l'IPA
+        run: |
+          mkdir -p build/ipa/Payload
+          cp -R build/ios/iphoneos/Runner.app build/ipa/Payload/
+          cd build/ipa
+          zip -qry MC-Analyzer-iOS.ipa Payload
+          ls -l MC-Analyzer-iOS.ipa
+
+      - name: Publier la release ios-latest
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete ios-latest --yes --cleanup-tag || true
+          gh release create ios-latest build/ipa/MC-Analyzer-iOS.ipa \
+            --title "MC Analyzer iOS (non signée)" \
+            --notes "Version iPhone non signée, compilée depuis ${GITHUB_SHA}. Installation impossible telle quelle : elle doit être signée (compte Apple) avant d'aller sur un iPhone." \
+            --target "${GITHUB_SHA}" \
+            --latest=false

@@ -75,7 +75,7 @@ class FirebaseAuthService implements AuthService {
           // Dialogue natif : la clé Android reste limitée à l'application signée.
           final g = GoogleSignIn.instance;
           if (!_googleReady) {
-            await g.initialize(serverClientId: _webClientId);
+            await g.initialize(clientId: _auth.app.options.iosClientId, serverClientId: _webClientId);
             _googleReady = true;
           }
           final account = await g.authenticate();
