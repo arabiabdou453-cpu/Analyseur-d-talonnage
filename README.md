@@ -1,4 +1,4 @@
-<img src="webapp/logo.png" alt="Logo" width="96">
+<img src="webapp/logo.svg" alt="Logo" width="96">
 
 # AnalyseurEtalonnage — MATLAB desktop
 

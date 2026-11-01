@@ -230,7 +230,7 @@ class PageHeader extends StatelessWidget {
   }
 }
 
-/// Logo de l'application (tuile aux coins arrondis).
+/// Logo de l'application : marque vectorielle (tracé de MCA Icon.svg) sur sa tuile.
 class AppLogo extends StatelessWidget {
   const AppLogo({super.key, required this.size});
   final double size;
@@ -238,6 +238,57 @@ class AppLogo extends StatelessWidget {
   @override
   Widget build(BuildContext context) => ClipRRect(
         borderRadius: BorderRadius.circular(size * .26),
-        child: Image.asset('assets/logo.png', width: size, height: size, filterQuality: FilterQuality.medium, excludeFromSemantics: true),
+        child: CustomPaint(size: Size.square(size), painter: const _LogoPainter()),
       );
+}
+
+class _LogoPainter extends CustomPainter {
+  const _LogoPainter();
+
+  static final Path _mark = Path()
+    ..moveTo(523.66, 27.72)
+    ..relativeLineTo(0, 279.09)
+    ..relativeCubicTo(0, 15.31, -12.41, 27.72, -27.72, 27.72)
+    ..relativeLineTo(-75.91, 0)
+    ..relativeCubicTo(-15.31, 0, -27.72, -12.41, -27.72, -27.72)
+    ..lineTo(392.31, 85.06)
+    ..relativeCubicTo(0, -11.2, -14.15, -16.1, -21.08, -7.29)
+    ..relativeLineTo(-32.21, 40.96)
+    ..relativeCubicTo(-7.48, 9.51, -11.54, 21.25, -11.54, 33.35)
+    ..relativeLineTo(0, 154.73)
+    ..relativeCubicTo(0, 15.31, -12.41, 27.72, -27.72, 27.72)
+    ..relativeLineTo(-75.91, 0)
+    ..relativeCubicTo(-15.29, 0, -27.7, -12.41, -27.7, -27.72)
+    ..relativeLineTo(0, -120.11)
+    ..relativeCubicTo(0, -11.2, -14.15, -16.1, -21.08, -7.29)
+    ..relativeLineTo(-32.22, 40.98)
+    ..relativeCubicTo(-7.48, 9.51, -11.54, 21.25, -11.54, 33.35)
+    ..relativeLineTo(0, 53.07)
+    ..relativeCubicTo(0, 15.31, -12.41, 27.72, -27.72, 27.72)
+    ..lineTo(27.72, 334.53)
+    ..relativeCubicTo(-15.31, 0, -27.72, -12.41, -27.72, -27.72)
+    ..relativeLineTo(0, -75.91)
+    ..relativeCubicTo(0, -15.29, 12.41, -27.7, 27.72, -27.7)
+    ..relativeLineTo(71.95, 0)
+    ..relativeCubicTo(10.78, 0, 20.96, -4.95, 27.62, -13.42)
+    ..relativeLineTo(48.16, -61.25)
+    ..relativeCubicTo(13.08, -16.63, 33.06, -26.34, 54.22, -26.34)
+    ..relativeLineTo(65.66, 0)
+    ..relativeCubicTo(10.78, 0, 20.96, -4.95, 27.62, -13.42)
+    ..relativeLineTo(56.88, -72.34)
+    ..relativeCubicTo(8.16, -10.38, 20.63, -16.44, 33.83, -16.44)
+    ..relativeLineTo(82.26, 0)
+    ..relativeCubicTo(15.31, 0, 27.72, 12.41, 27.72, 27.72)
+    ..close();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.drawRect(Offset.zero & size, Paint()..color = const Color(0xFFEEF0FF));
+    canvas.scale(size.width / 640);
+    canvas.translate(58.17, 152.735);
+    canvas.drawPath(_mark, Paint()..color = const Color(0xFF2B3BFC));
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
