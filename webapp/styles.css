@@ -78,10 +78,8 @@ svg { flex-shrink: 0; }
 }
 .appbar-inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-top: 14px; padding-bottom: 10px; }
 .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
-.brand-mark {
-  width: 40px; height: 40px; border-radius: 11px; display: grid; place-items: center; color: #fff;
-  background: linear-gradient(140deg, #0e6e8c, #0b3d5c); box-shadow: inset 0 0 0 1px rgba(255,255,255,.12);
-}
+.brand-mark { width: 40px; height: 40px; border-radius: 11px; overflow: hidden; flex: none; }
+.brand-mark img { display: block; width: 100%; height: 100%; }
 .brand-text { display: grid; min-width: 0; }
 .brand-text strong { font-size: 16.5px; letter-spacing: -.01em; }
 .brand-text span { color: var(--text-3); font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

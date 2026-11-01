@@ -1,3 +1,5 @@
+<img src="webapp/logo.png" alt="Logo" width="96">
+
 # AnalyseurEtalonnage — MATLAB desktop
 
 Application source en français pour analyser des données de certificat d’étalonnage, exploiter les modèles de correction/incertitude et produire des exports. Cible prévue : MATLAB R2021a sous Windows.
@@ -23,12 +25,14 @@ Consultez le [guide utilisateur](docs/GUIDE_UTILISATEUR.md), les [limites métro
 | Site web | https://analyseur-etalonnage.vercel.app | `webapp/` | `webapp/tests.html` (servi localement, voir `webapp/start-server.bat`) |
 | Application Flutter (Android / iOS, aperçu web) | https://analyseur-etalonnage-app.vercel.app | `mobile/` | `flutter test` dans `mobile/` |
 
+**Application Android : [télécharger l’APK](https://github.com/arabiabdou453-cpu/Analyseur-d-talonnage/raw/main/application-android/Analyseur-Etalonnage.apk)** (dossier `application-android/`). À installer sur le téléphone en autorisant cette source.
+
 Les deux versions partagent les mêmes règles métrologiques et les mêmes cas de test (dont le cas du cahier des charges : I = 50 → C = −0,1 ; valeur corrigée 49,9 ; U = 0,0766667 ; U prudente = 0,0848571 ; I = 120 et I = −5 bloqués) :
 
 - régression linéaire par moindres carrés ordinaires, non pondérée ; résidu e = y − (a·x + b) ;
-- n < 2 bloqué, n = 2 averti (droite exacte, non représentative) ;
+- n < 3 bloqué (minimum 3 points) ;
 - incertitude relative (% de la lecture) convertie en absolue avant régression, valeur d’origine conservée ;
-- U prudente = U modélisée + résidu max (recommandée) ; U modélisée négative signalée « non exploitable », jamais remplacée par 0 ;
+- calculateur : U(I) modélisée ; négative à une borne : calcul bloqué, jamais remplacée par 0 (U prudente = U modélisée + résidu max conservée dans le rapport) ;
 - affichage : U à 2 chiffres significatifs arrondie vers le haut, correction avec le même nombre de décimales ; valeurs stockées jamais arrondies ;
 - hors étendue bloqué ; k = 2 pré-rempli mais « à vérifier » tant qu’il n’est pas lu sur le certificat ; alerte de linéarité ; bandeau si certificat expiré ;
 - export Excel « Interpolation » / « Modélisation » avec vraies formules (SLOPE, INTERCEPT, RSQ, COUNT, MAX), valeurs en cache et graphique XY avec tendance.

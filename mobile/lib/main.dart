@@ -108,12 +108,7 @@ class _HomeShellState extends State<HomeShell> {
       appBar: AppBar(
         titleSpacing: 16,
         title: Row(children: [
-          Container(
-            width: 34,
-            height: 34,
-            decoration: BoxDecoration(color: Palette.primary, borderRadius: BorderRadius.circular(9)),
-            child: const Icon(Icons.speed, color: Colors.white, size: 20),
-          ),
+          const AppLogo(size: 34),
           const SizedBox(width: 10),
           Flexible(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

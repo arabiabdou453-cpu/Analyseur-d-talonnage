@@ -229,3 +229,15 @@ class PageHeader extends StatelessWidget {
     );
   }
 }
+
+/// Logo de l'application (tuile aux coins arrondis).
+class AppLogo extends StatelessWidget {
+  const AppLogo({super.key, required this.size});
+  final double size;
+
+  @override
+  Widget build(BuildContext context) => ClipRRect(
+        borderRadius: BorderRadius.circular(size * .26),
+        child: Image.asset('assets/logo.png', width: size, height: size, filterQuality: FilterQuality.medium, excludeFromSemantics: true),
+      );
+}

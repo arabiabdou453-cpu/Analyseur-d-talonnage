@@ -117,14 +117,7 @@ class _LoginPageState extends State<LoginPage> {
             constraints: const BoxConstraints(maxWidth: 420),
             child: AutofillGroup(
               child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                Center(
-                  child: Container(
-                    width: 56,
-                    height: 56,
-                    decoration: BoxDecoration(color: Palette.primary, borderRadius: BorderRadius.circular(14)),
-                    child: const Icon(Icons.speed, color: Colors.white, size: 32),
-                  ),
-                ),
+                const Center(child: AppLogo(size: 56)),
                 const SizedBox(height: 14),
                 Text(s.t('app.title'), textAlign: TextAlign.center, style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700)),
                 const SizedBox(height: 6),

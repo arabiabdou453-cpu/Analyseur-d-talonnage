@@ -3,7 +3,7 @@
     "short_name": "Étalonnage",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
+    "background_color": "#EEF0FF",
     "theme_color": "#0175C2",
     "description": "Analyse des certificats d'étalonnage : correction et incertitude",
     "orientation": "portrait-primary",
