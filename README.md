@@ -1,6 +1,6 @@
 <img src="webapp/logo.svg" alt="Logo" width="96">
 
-# AnalyseurEtalonnage — MATLAB desktop
+# MC Analyzer
 
 Application source en français pour analyser des données de certificat d’étalonnage, exploiter les modèles de correction/incertitude et produire des exports. Cible prévue : MATLAB R2021a sous Windows.
 
@@ -25,7 +25,7 @@ Consultez le [guide utilisateur](docs/GUIDE_UTILISATEUR.md), les [limites métro
 | Site web | https://analyseur-etalonnage.vercel.app | `webapp/` | `webapp/tests.html` (servi localement, voir `webapp/start-server.bat`) |
 | Application Flutter (Android / iOS, aperçu web) | https://analyseur-etalonnage-app.vercel.app | `mobile/` | `flutter test` dans `mobile/` |
 
-**Application Android : [télécharger l’APK](https://github.com/arabiabdou453-cpu/Analyseur-d-talonnage/raw/main/application-android/Analyseur-Etalonnage.apk)** (dossier `application-android/`). À installer sur le téléphone en autorisant cette source.
+**Application Android : [télécharger l’APK](https://github.com/arabiabdou453-cpu/Analyseur-d-talonnage/raw/main/application-android/MC-Analyzer.apk)** (dossier `application-android/`). À installer sur le téléphone en autorisant cette source.
 
 Les deux versions partagent les mêmes règles métrologiques et les mêmes cas de test (dont le cas du cahier des charges : I = 50 → C = −0,1 ; valeur corrigée 49,9 ; U = 0,0766667 ; U prudente = 0,0848571 ; I = 120 et I = −5 bloqués) :
 

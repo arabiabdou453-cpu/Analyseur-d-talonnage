@@ -1,4 +1,4 @@
-/* Analyseur d'étalonnage — version web.
+/* MC Analyzer — version web.
  * Reproduit la logique de core/ (ajusterDroite, validerDonnees, analyserEtalonnage,
  * evaluerCritere, calculerResultat). Tout s'exécute dans le navigateur. */
 (() => {
@@ -10,7 +10,7 @@
   /* ---------- i18n ---------- */
   const I18N = {
     ar: {
-      'app.title': 'محلل المعايرة',
+      'app.title': 'MC Analyzer',
       'app.subtitle': 'تحليل شهادات المعايرة · نماذج التصحيح وعدم اليقين',
       'tab.data': 'البيانات', 'tab.analysis': 'التحليل', 'tab.calc': 'الحاسبة', 'tab.report': 'التقرير',
       'theme': 'تبديل المظهر',
@@ -136,7 +136,7 @@
       'btn.addHistory': 'إضافة إلى السجل', 'btn.excel': 'تصدير Excel', 'toast.excel': 'تم تصدير ملف Excel',
     },
     fr: {
-      'app.title': 'Analyseur d’étalonnage',
+      'app.title': 'MC Analyzer',
       'app.subtitle': 'Certificats d’étalonnage · modèles de correction et d’incertitude',
       'tab.data': 'Données', 'tab.analysis': 'Analyse', 'tab.calc': 'Calculateur', 'tab.report': 'Rapport',
       'theme': 'Changer de thème',

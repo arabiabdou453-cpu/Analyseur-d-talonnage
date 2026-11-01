@@ -27,7 +27,7 @@ Future<AppState> _app(WidgetTester tester) async {
 void main() {
   testWidgets('français par défaut ; exemple, analyse et calcul', (tester) async {
     final s = await _app(tester);
-    expect(find.text('Analyseur d’étalonnage'), findsOneWidget);
+    expect(find.text('MC Analyzer'), findsOneWidget);
     expect(find.text('Données'), findsWidgets);
 
     await tester.tap(find.text('Exemple')); // exemple tiré au hasard : 5 à 8 points
@@ -84,8 +84,8 @@ void main() {
     final s = await _app(tester);
     s.toggleLang();
     await tester.pumpAndSettle();
-    expect(find.text('محلل المعايرة'), findsOneWidget);
-    final dir = Directionality.of(tester.element(find.text('محلل المعايرة')));
+    expect(find.text('MC Analyzer'), findsOneWidget);
+    final dir = Directionality.of(tester.element(find.text('MC Analyzer')));
     expect(dir, TextDirection.rtl);
     await tester.pump(const Duration(seconds: 1)); // laisse passer l'enregistrement différé du brouillon
   });

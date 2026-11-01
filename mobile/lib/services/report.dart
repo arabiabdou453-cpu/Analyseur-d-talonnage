@@ -55,8 +55,8 @@ Future<Uint8List> buildReport({
 }) async {
   final doc = pw.Document(
     title: "Rapport d'analyse d'étalonnage",
-    creator: "Analyseur d'étalonnage",
-    producer: "Analyseur d'étalonnage",
+    creator: 'MC Analyzer',
+    producer: 'MC Analyzer',
   );
   final font = PdfFont.helvetica(doc.document);
   final nature = switch (meta.nature) { 'U' => 'Élargie U', 'u' => 'Type u', _ => 'Inconnue' };

@@ -7,7 +7,7 @@ $types = @{ '.html'='text/html; charset=utf-8'; '.css'='text/css; charset=utf-8'
 $l = New-Object System.Net.HttpListener
 $l.Prefixes.Add("http://localhost:$Port/")
 $l.Start()
-Write-Host "Analyseur d'etalonnage : http://localhost:$Port  (fermez cette fenetre pour arreter)"
+Write-Host "MC Analyzer : http://localhost:$Port  (fermez cette fenetre pour arreter)"
 Start-Process "http://localhost:$Port"
 while ($l.IsListening) {
   $ctx = $l.GetContext()

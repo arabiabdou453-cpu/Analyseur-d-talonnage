@@ -1,6 +1,6 @@
 {
-    "name": "Analyseur d’étalonnage",
-    "short_name": "Étalonnage",
+    "name": "MC Analyzer",
+    "short_name": "MC Analyzer",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#EEF0FF",

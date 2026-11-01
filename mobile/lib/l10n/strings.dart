@@ -11,7 +11,7 @@ String tr(String lang, String key, [Map<String, Object> vars = const {}]) {
 
 const Map<String, Map<String, String>> _strings = {
   'fr': {
-    'app.title': 'Analyseur d’étalonnage',
+    'app.title': 'MC Analyzer',
     'app.subtitle': 'Correction et incertitude',
     'tab.data': 'Données',
     'tab.analysis': 'Analyse',
@@ -227,7 +227,7 @@ const Map<String, Map<String, String>> _strings = {
     'btn.excel': 'Exporter Excel',
   },
   'ar': {
-    'app.title': 'محلل المعايرة',
+    'app.title': 'MC Analyzer',
     'app.subtitle': 'التصحيح وعدم اليقين',
     'tab.data': 'البيانات',
     'tab.analysis': 'التحليل',
