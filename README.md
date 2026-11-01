@@ -27,6 +27,8 @@ Consultez le [guide utilisateur](docs/GUIDE_UTILISATEUR.md), les [limites métro
 
 **Application Android : [télécharger l’APK](https://github.com/arabiabdou453-cpu/Analyseur-d-talonnage/raw/main/application-android/MC-Analyzer.apk)** (dossier `application-android/`). À installer sur le téléphone en autorisant cette source.
 
+**iPhone : [télécharger l’IPA non signée](https://github.com/arabiabdou453-cpu/Analyseur-d-talonnage/releases/download/ios-latest/MC-Analyzer-iOS.ipa)** (compilée sur Mac par GitHub Actions). Elle doit être signée avec un compte Apple avant d’aller sur un iPhone.
+
 Les deux versions partagent les mêmes règles métrologiques et les mêmes cas de test (dont le cas du cahier des charges : I = 50 → C = −0,1 ; valeur corrigée 49,9 ; U = 0,0766667 ; U prudente = 0,0848571 ; I = 120 et I = −5 bloqués) :
 
 - régression linéaire par moindres carrés ordinaires, non pondérée ; résidu e = y − (a·x + b) ;
