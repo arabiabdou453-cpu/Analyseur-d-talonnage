@@ -117,9 +117,48 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byType(NavigationBar), findsOneWidget);
 
-    await tester.tap(find.byIcon(Icons.logout));
+    await tester.tap(find.byIcon(Icons.account_circle_outlined));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Se déconnecter'));
     await tester.pumpAndSettle();
     expect(find.text('Continuer avec Google'), findsOneWidget);
+    await tester.pump(const Duration(seconds: 1));
+  });
+  testWidgets('suppression du compte : confirmation, données effacées, retour à la connexion', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    tester.view.devicePixelRatio = 3;
+    tester.view.physicalSize = const Size(1080, 2340);
+    addTearDown(tester.view.reset);
+    final state = AppState();
+    await state.restore();
+    final auth = _FakeAuth();
+    await auth.signInWithEmail('metrologue@example.com', 'motdepasse-test');
+    await tester.pumpWidget(EtalonnageApp(state: state, auth: auth));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Exemple'));
+    await tester.pumpAndSettle();
+    expect(state.filledRows, isNotEmpty);
+
+    Future<void> openDelete() async {
+      await tester.tap(find.byIcon(Icons.account_circle_outlined));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Supprimer mon compte'));
+      await tester.pumpAndSettle();
+    }
+
+    await openDelete();
+    await tester.tap(find.text('Annuler')); // annuler ne supprime rien
+    await tester.pumpAndSettle();
+    expect(auth.current, isNotNull);
+    expect(state.filledRows, isNotEmpty);
+
+    await openDelete();
+    await tester.tap(find.text('Supprimer définitivement'));
+    await tester.pumpAndSettle();
+    expect(auth.current, isNull);
+    expect(state.filledRows, isEmpty);
+    expect(find.text('Continuer avec Google'), findsOneWidget);
+    expect(find.text('Politique de confidentialité'), findsOneWidget);
     await tester.pump(const Duration(seconds: 1));
   });
 }
@@ -152,4 +191,6 @@ class _FakeAuth implements AuthService {
   Future<void> resetPassword(String email) async {}
   @override
   Future<void> signOut() async => _set(null);
+  @override
+  Future<void> deleteAccount() async => _set(null);
 }

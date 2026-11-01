@@ -4,6 +4,18 @@ import '../services/auth.dart';
 import '../state/app_state.dart';
 import 'common.dart';
 
+void showPrivacyDialog(BuildContext context) {
+  final s = AppScope.of(context);
+  showDialog<void>(
+    context: context,
+    builder: (d) => AlertDialog(
+      title: Text(s.t('privacy.title')),
+      content: SingleChildScrollView(child: SelectableText(s.t('privacy.body'))),
+      actions: [TextButton(onPressed: () => Navigator.pop(d), child: Text(s.t('btn.close')))],
+    ),
+  );
+}
+
 /// Affiche [child] seulement si un utilisateur est connecté, sinon l'écran de connexion.
 class AuthGate extends StatefulWidget {
   const AuthGate({super.key, required this.auth, required this.child});
@@ -173,6 +185,7 @@ class _LoginPageState extends State<LoginPage> {
                   child: Text(s.t(_register ? 'auth.haveAccount' : 'auth.noAccount')),
                 ),
                 if (!_register) TextButton(onPressed: _busy ? null : _forgot, child: Text(s.t('auth.forgot'))),
+                TextButton(onPressed: () => showPrivacyDialog(context), child: Text(s.t('privacy.title'))),
               ]),
             ),
           ),

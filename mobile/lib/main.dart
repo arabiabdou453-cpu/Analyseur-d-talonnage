@@ -86,6 +86,43 @@ class _HomeShellState extends State<HomeShell> {
 
   void _go(int i) => setState(() => _tab = i);
 
+  Future<void> _onAccountMenu(String action, AppState s) async {
+    final auth = widget.auth!;
+    switch (action) {
+      case 'signOut':
+        await auth.signOut();
+      case 'privacy':
+        showPrivacyDialog(context);
+      case 'delete':
+        final messenger = ScaffoldMessenger.of(context);
+        final ok = await showDialog<bool>(
+          context: context,
+          builder: (d) => AlertDialog(
+            title: Text(s.t('account.deleteTitle')),
+            content: Text(s.t('account.deleteBody')),
+            actions: [
+              TextButton(onPressed: () => Navigator.pop(d, false), child: Text(s.t('btn.cancel'))),
+              FilledButton(
+                style: FilledButton.styleFrom(
+                  backgroundColor: Theme.of(d).colorScheme.error,
+                  foregroundColor: Theme.of(d).colorScheme.onError,
+                ),
+                onPressed: () => Navigator.pop(d, true),
+                child: Text(s.t('account.deleteConfirm')),
+              ),
+            ],
+          ),
+        );
+        if (ok != true) return;
+        try {
+          await auth.deleteAccount();
+          await s.clearLocalData();
+        } on AuthError catch (e) {
+          messenger.showSnackBar(SnackBar(content: Text(s.t(e.code))));
+        }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final s = AppScope.of(context);
@@ -125,10 +162,17 @@ class _HomeShellState extends State<HomeShell> {
             onPressed: () => s.toggleTheme(theme.brightness),
           ),
           if (widget.auth != null)
-            IconButton(
-              tooltip: '${s.t('auth.signOut')} (${widget.auth!.current?.email ?? ''})',
-              icon: const Icon(Icons.logout),
-              onPressed: widget.auth!.signOut,
+            PopupMenuButton<String>(
+              tooltip: s.t('account.menu'),
+              icon: const Icon(Icons.account_circle_outlined),
+              onSelected: (v) => _onAccountMenu(v, s),
+              itemBuilder: (_) => [
+                PopupMenuItem(enabled: false, child: Text(widget.auth!.current?.email ?? '')),
+                const PopupMenuDivider(),
+                PopupMenuItem(value: 'signOut', child: Text(s.t('auth.signOut'))),
+                PopupMenuItem(value: 'privacy', child: Text(s.t('privacy.title'))),
+                PopupMenuItem(value: 'delete', child: Text(s.t('account.delete'))),
+              ],
             ),
           const SizedBox(width: 4),
         ],

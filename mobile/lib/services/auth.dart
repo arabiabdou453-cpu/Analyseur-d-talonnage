@@ -29,6 +29,7 @@ abstract class AuthService {
   Future<void> register(String email, String password);
   Future<void> resetPassword(String email);
   Future<void> signOut();
+  Future<void> deleteAccount();
 }
 
 class FirebaseAuthService implements AuthService {
@@ -50,6 +51,7 @@ class FirebaseAuthService implements AuthService {
     } on FirebaseAuthException catch (e) {
       throw AuthError(switch (e.code) {
         'missing-password' => 'auth.missingPassword',
+        'requires-recent-login' => 'auth.recentLogin',
         'invalid-email' => 'auth.invalidEmail',
         'invalid-credential' || 'wrong-password' || 'user-not-found' => 'auth.badCredentials',
         'email-already-in-use' => 'auth.emailInUse',
@@ -102,4 +104,10 @@ class FirebaseAuthService implements AuthService {
     if (_googleReady) await GoogleSignInPlatform.instance.signOut(const SignOutParams());
     await _auth.signOut();
   }
+
+  @override
+  Future<void> deleteAccount() => _run(() async {
+        await _auth.currentUser?.delete();
+        if (_googleReady) await GoogleSignInPlatform.instance.signOut(const SignOutParams());
+      });
 }

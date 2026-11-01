@@ -34,6 +34,7 @@ jobs:
 
       - name: Tests
         run: |
+          xcodebuild -version
           flutter --version
           flutter pub get
           flutter test

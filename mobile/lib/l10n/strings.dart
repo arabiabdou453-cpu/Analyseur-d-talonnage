@@ -42,6 +42,21 @@ const Map<String, Map<String, String>> _strings = {
     'auth.cancelled': 'La fenêtre Google a été fermée avant la fin. Réessayez et choisissez votre compte.',
     'auth.popupBlocked': 'Fenêtre de connexion bloquée par le navigateur : autorisez les fenêtres pop-up pour ce site.',
     'auth.failed': 'La connexion a échoué. Réessayez.',
+    'auth.recentLogin': 'Par sécurité, déconnectez-vous, reconnectez-vous, puis réessayez.',
+    'account.menu': 'Mon compte',
+    'account.delete': 'Supprimer mon compte',
+    'account.deleteTitle': 'Supprimer votre compte ?',
+    'account.deleteBody': 'Votre compte sera supprimé définitivement et les données d’étalonnage enregistrées sur cet appareil seront effacées. Cette action est irréversible.',
+    'account.deleteConfirm': 'Supprimer définitivement',
+    'btn.close': 'Fermer',
+    'privacy.title': 'Politique de confidentialité',
+    'privacy.body':
+        'MC Analyzer ne contient ni publicité ni suivi, et ne vend aucune donnée.\n\n'
+        'Compte : pour la connexion, l’application utilise Firebase Authentication (Google). Il traite votre adresse email, votre nom si vous utilisez la connexion Google, l’identifiant du compte et des données techniques (adresse IP, appareil). Ces données servent uniquement à vous connecter. Le mot de passe est géré par Firebase et n’est jamais lisible par nous.\n\n'
+        'Données d’étalonnage : les certificats, les points et les résultats sont traités et enregistrés uniquement sur votre appareil. Ils ne sont envoyés à aucun serveur et ne quittent l’appareil que si vous les exportez ou les partagez vous-même.\n\n'
+        'Prestataires : pour les versions web, l’hébergeur (Vercel), Google (polices, connexion) et cdnjs (lecture des PDF sur le site) reçoivent des données techniques de connexion, comme l’adresse IP. Ces prestataires assurent une protection au moins équivalente à celle décrite ici.\n\n'
+        'Conservation et suppression : votre compte est conservé jusqu’à sa suppression. Vous pouvez le supprimer à tout moment depuis le menu du compte (« Supprimer mon compte ») ; les données d’étalonnage enregistrées sur l’appareil sont alors effacées aussi.\n\n'
+        'Contact et texte complet : https://analyseur-etalonnage.vercel.app/confidentialite',
     'data.h': 'Données du certificat',
     'data.p': 'Saisissez les points tels qu’ils figurent sur le certificat, puis réglez les critères d’acceptation.',
     'points.title': 'Points d’étalonnage',
@@ -258,6 +273,21 @@ const Map<String, Map<String, String>> _strings = {
     'auth.cancelled': 'أُغلقت نافذة Google قبل انتهاء الدخول. أعد المحاولة واختر حسابك.',
     'auth.popupBlocked': 'المتصفح منع نافذة تسجيل الدخول: اسمح بالنوافذ المنبثقة لهذا الموقع.',
     'auth.failed': 'فشل تسجيل الدخول. أعد المحاولة.',
+    'auth.recentLogin': 'لأسباب أمنية، سجّل الخروج ثم الدخول من جديد، وأعد المحاولة.',
+    'account.menu': 'حسابي',
+    'account.delete': 'حذف حسابي',
+    'account.deleteTitle': 'حذف حسابك؟',
+    'account.deleteBody': 'سيُحذف حسابك نهائيًا وتُمسَح بيانات المعايرة المحفوظة على هذا الجهاز. لا يمكن التراجع عن هذا الإجراء.',
+    'account.deleteConfirm': 'حذف نهائي',
+    'btn.close': 'إغلاق',
+    'privacy.title': 'سياسة الخصوصية',
+    'privacy.body':
+        'لا يحتوي MC Analyzer على إعلانات أو تتبّع، ولا يبيع أي بيانات.\n\n'
+        'الحساب: لتسجيل الدخول يستعمل التطبيق Firebase Authentication من Google. وهو يعالج بريدك الإلكتروني، واسمك إذا استعملت الدخول عبر Google، ومعرّف الحساب وبيانات تقنية (عنوان IP، الجهاز). تُستعمل هذه البيانات لتسجيل الدخول فقط. كلمة السر يديرها Firebase ولا يمكننا قراءتها.\n\n'
+        'بيانات المعايرة: تُعالَج الشهادات والنقاط والنتائج وتُحفَظ على جهازك فقط. لا تُرسَل إلى أي خادم، ولا تغادر الجهاز إلا إذا صدّرتها أو شاركتها بنفسك.\n\n'
+        'مقدّمو الخدمات: في نسختي الويب، يتلقى مزوّد الاستضافة (Vercel) وGoogle (الخطوط وتسجيل الدخول) وcdnjs (قراءة ملفات PDF في الموقع) بيانات اتصال تقنية مثل عنوان IP. يوفّر هؤلاء المزوّدون حماية مكافئة على الأقل لما هو موضّح هنا.\n\n'
+        'الحفظ والحذف: يبقى حسابك محفوظًا حتى تحذفه. يمكنك حذفه في أي وقت من قائمة الحساب («حذف حسابي»)، وتُمسَح عندها بيانات المعايرة المحفوظة على الجهاز أيضًا.\n\n'
+        'التواصل والنص الكامل: https://analyseur-etalonnage.vercel.app/confidentialite',
     'data.h': 'بيانات الشهادة',
     'data.p': 'أدخل نقاط المعايرة كما وردت في الشهادة، ثم حدّد معايير القبول.',
     'points.title': 'نقاط المعايرة',

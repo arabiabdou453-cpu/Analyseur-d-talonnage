@@ -389,6 +389,28 @@ class AppState extends ChangeNotifier {
     });
   }
 
+  /// Efface les données d'étalonnage de l'appareil (suppression du compte).
+  Future<void> clearLocalData() async {
+    for (final e in metaCtl.entries) {
+      e.value.text = e.key == 'k' ? '2' : '';
+    }
+    kVerified = false;
+    nature = '';
+    uncType = UncType.absolute;
+    history.clear();
+    lastResult = null;
+    calcError = null;
+    calcInput.clear();
+    clearRows();
+    _saveTimer?.cancel();
+    try {
+      final p = await SharedPreferences.getInstance();
+      await p.remove(_kDraft);
+    } catch (_) {
+      // Stockage indisponible : rien à effacer.
+    }
+  }
+
   Future<void> restore() async {
     try {
       final p = await SharedPreferences.getInstance();
